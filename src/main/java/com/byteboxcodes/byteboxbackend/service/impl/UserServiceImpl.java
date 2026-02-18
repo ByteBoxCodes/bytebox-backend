@@ -2,6 +2,7 @@ package com.byteboxcodes.byteboxbackend.service.impl;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void register(UserRequest request) {
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .username(request.getUsername())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-        return user.getPassword().equals(request.getPassword());
+        return passwordEncoder.matches(request.getPassword(), user.getPassword());
     }
 
 }
