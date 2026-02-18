@@ -1,0 +1,33 @@
+package com.byteboxcodes.byteboxbackend.service.impl;
+
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+
+import com.byteboxcodes.byteboxbackend.dto.UserRequest;
+import com.byteboxcodes.byteboxbackend.entity.User;
+import com.byteboxcodes.byteboxbackend.repository.UserRepository;
+import com.byteboxcodes.byteboxbackend.service.UserService;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    public void register(UserRequest request) {
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(request.getPassword())
+                .role("USER")
+                .createdAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+    }
+
+}
