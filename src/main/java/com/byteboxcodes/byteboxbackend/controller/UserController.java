@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.service.UserService;
@@ -19,15 +20,32 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public String register(@RequestBody UserRequest request) {
+    public ApiResponse<String> register(@RequestBody UserRequest request) {
         userService.register(request);
-        return "User registered successfully";
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("User registered successfully")
+                .data("User registered successfully")
+                .build();
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public ApiResponse<String> login(@RequestBody LoginRequest request) {
         boolean isValid = userService.login(request);
-        return isValid ? "Login successful" : "Invalid credentials";
+
+        if (isValid) {
+            return ApiResponse.<String>builder()
+                    .success(true)
+                    .message("Login successful")
+                    .data(request.getEmail())
+                    .build();
+        } else {
+            return ApiResponse.<String>builder()
+                    .success(false)
+                    .message("Login failed")
+                    .data("Invalid credentials")
+                    .build();
+        }
     }
 
 }
