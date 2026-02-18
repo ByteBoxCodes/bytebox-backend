@@ -1,10 +1,15 @@
 package com.byteboxcodes.byteboxbackend.repository;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.parsing.Problem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProblemRespository extends JpaRepository<Problem, UUID> {
+import com.byteboxcodes.byteboxbackend.entity.Difficulty;
+import com.byteboxcodes.byteboxbackend.entity.Problem;
 
+public interface ProblemRespository extends JpaRepository<Problem, UUID> {
+    List<Problem> findByDifficulty(Difficulty difficulty);;
+
+    List<Problem> findByTopic(String topic);
 }
