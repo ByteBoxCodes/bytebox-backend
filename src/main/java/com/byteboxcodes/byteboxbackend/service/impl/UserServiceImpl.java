@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
+import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
@@ -28,6 +29,17 @@ public class UserServiceImpl implements UserService {
                 .createdAt(LocalDateTime.now())
                 .build();
         userRepository.save(user);
+    }
+
+    @Override
+    public boolean login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if (user == null) {
+            return false;
+        }
+
+        return user.getPassword().equals(request.getPassword());
     }
 
 }
