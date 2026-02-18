@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.entity.User;
+import com.byteboxcodes.byteboxbackend.exception.UserAlreadyExists;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
@@ -20,6 +21,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(UserRequest request) {
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new UserAlreadyExists("Email already exists");
+        }
+
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new UserAlreadyExists("Username already exists");
+        }
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
