@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.byteboxcodes.byteboxbackend.entity.Difficulty;
 import com.byteboxcodes.byteboxbackend.entity.Problem;
+import com.byteboxcodes.byteboxbackend.entity.Topic;
 import com.byteboxcodes.byteboxbackend.repository.ProblemRespository;
+import com.byteboxcodes.byteboxbackend.repository.TopicRespository;
 import com.byteboxcodes.byteboxbackend.service.ProblemService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProblemServiceImpl implements ProblemService {
     private final ProblemRespository problemRespository;
+    private final TopicRespository topicRespository;
 
     @Override
     public List<Problem> getAllProblems() {
@@ -34,7 +37,9 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public List<Problem> getProblemsByTopic(String topic) {
+    public List<Problem> getProblemsByTopic(String topicName) {
+        Topic topic = topicRespository.findByName(topicName).orElseThrow(
+                () -> new RuntimeException("Topic not found"));
         return problemRespository.findByTopic(topic);
     }
 }
