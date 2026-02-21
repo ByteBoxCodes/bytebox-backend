@@ -7,6 +7,6 @@ public interface UserService {
 
     void register(UserRequest request);
 
-    boolean login(LoginRequest request);
+    String login(LoginRequest request);
 
 }

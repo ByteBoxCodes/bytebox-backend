@@ -31,13 +31,13 @@ public class UserController {
 
     @PostMapping("/login")
     public ApiResponse<String> login(@RequestBody LoginRequest request) {
-        boolean isValid = userService.login(request);
+        String token = userService.login(request);
 
-        if (isValid) {
+        if (token != null) {
             return ApiResponse.<String>builder()
                     .success(true)
                     .message("Login successful")
-                    .data(request.getEmail())
+                    .data(token)
                     .build();
         } else {
             return ApiResponse.<String>builder()

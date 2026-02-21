@@ -10,6 +10,7 @@ import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.exception.UserAlreadyExists;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
+import com.byteboxcodes.byteboxbackend.security.JwtUtil;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
     public void register(UserRequest request) {
@@ -44,14 +46,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+    public String login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid Credentials"));
 
-        if (user == null) {
-            return false;
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid Credentials");
         }
 
-        return passwordEncoder.matches(request.getPassword(), user.getPassword());
+        return jwtUtil.generateToken(user.getEmail());
     }
 
 }
