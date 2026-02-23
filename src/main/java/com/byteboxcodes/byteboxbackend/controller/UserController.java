@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
+import com.byteboxcodes.byteboxbackend.dto.UserResponse;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/users")
@@ -46,6 +49,18 @@ public class UserController {
                     .data("Invalid credentials")
                     .build();
         }
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getCurrentUser() {
+
+        UserResponse user = userService.getCurrentUser();
+
+        return ApiResponse.<UserResponse>builder()
+                .success(true)
+                .message("User fetched successfully")
+                .data(user)
+                .build();
     }
 
 }

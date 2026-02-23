@@ -2,11 +2,13 @@ package com.byteboxcodes.byteboxbackend.service.impl;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
+import com.byteboxcodes.byteboxbackend.dto.UserResponse;
 import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.exception.UserAlreadyExists;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
@@ -55,6 +57,20 @@ public class UserServiceImpl implements UserService {
         }
 
         return jwtUtil.generateToken(user.getEmail());
+    }
+
+    @Override
+    public UserResponse getCurrentUser() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .name(user.getName())
+                .role(user.getRole())
+                .build();
     }
 
 }
