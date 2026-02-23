@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.byteboxcodes.byteboxbackend.dto.SubmissionRequest;
+import com.byteboxcodes.byteboxbackend.dto.SubmissionResponse;
 import com.byteboxcodes.byteboxbackend.entity.Submission;
 import com.byteboxcodes.byteboxbackend.service.SubmissionService;
 
@@ -25,13 +26,13 @@ public class SubmissionController {
     private final SubmissionService submissionService;
 
     @PostMapping
-    public Submission submit(@RequestBody SubmissionRequest request) {
+    public SubmissionResponse submit(@RequestBody SubmissionRequest request) {
         return submissionService.submitSolution(request);
     }
 
     @GetMapping("/user/{userId}")
     public List<Submission> getSubmissionsByUserId(@PathVariable UUID userId) {
-        return submissionService.getSubmissionsByUser(userId);
+        return submissionService.getSubmissionsByUser();
     }
 
     @GetMapping("/problem/{problemId}")

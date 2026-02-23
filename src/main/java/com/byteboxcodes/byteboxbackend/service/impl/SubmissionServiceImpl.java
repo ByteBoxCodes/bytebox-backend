@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.byteboxcodes.byteboxbackend.dto.JudgeResult;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionRequest;
+import com.byteboxcodes.byteboxbackend.dto.SubmissionResponse;
 import com.byteboxcodes.byteboxbackend.entity.Problem;
 import com.byteboxcodes.byteboxbackend.entity.Submission;
 import com.byteboxcodes.byteboxbackend.entity.SubmissionStatus;
@@ -14,59 +17,92 @@ import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.repository.ProblemRespository;
 import com.byteboxcodes.byteboxbackend.repository.SubmissionRepository;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
+import com.byteboxcodes.byteboxbackend.service.JudgeService;
 import com.byteboxcodes.byteboxbackend.service.SubmissionService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+
 public class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final ProblemRespository problemRespository;
+    private final JudgeService judgeService;
 
+    // 🔥 Submit Solution (JWT-secured)
     @Override
-    public Submission submitSolution(SubmissionRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+    public SubmissionResponse submitSolution(SubmissionRequest request) {
 
+        // 1️⃣ Get authenticated user from JWT
+        String email = (String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 2️⃣ Fetch problem
         Problem problem = problemRespository.findById(request.getProblemId())
                 .orElseThrow(() -> new RuntimeException("Problem not found"));
 
-        SubmissionStatus status;
-        if (request.getCode().contains("return")) {
-            status = SubmissionStatus.ACCEPTED;
-        } else {
-            status = SubmissionStatus.WRONG_ANSWER;
-        }
+        JudgeResult judgeResult = judgeService.judge(
+                problem.getId(),
+                request.getCode(),
+                request.getLanguage());
 
+        SubmissionStatus status = judgeResult.isAccepted()
+                ? SubmissionStatus.ACCEPTED
+                : SubmissionStatus.WRONG_ANSWER;
+
+        // 4️⃣ Create submission entity
         Submission submission = Submission.builder()
                 .user(user)
                 .problem(problem)
                 .code(request.getCode())
                 .language(request.getLanguage())
                 .status(status)
+                .totalTestCases(judgeResult.getTotalTestCases())
+                .passedTestCases(judgeResult.getPassedTestCases())
                 .submittedAt(LocalDateTime.now())
                 .build();
 
-        return submissionRepository.save(submission);
+        // 5️⃣ Save and return
+        submissionRepository.save(submission);
+
+        return SubmissionResponse.builder()
+                .submissionId(submission.getId())
+                .status(status)
+                .totalTestCases(judgeResult.getTotalTestCases())
+                .passedTestCases(judgeResult.getPassedTestCases())
+                .build();
     }
 
+    // 🔥 Get submissions of logged-in user
     @Override
-    public List<Submission> getSubmissionsByUser(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new RuntimeException("User not found"));
+    public List<Submission> getSubmissionsByUser() {
+
+        String email = (String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         return submissionRepository.findByUser(user);
     }
 
+    // 🔥 Get submissions by problem
     @Override
     public List<Submission> getSubmissionsByProblem(UUID problemId) {
-        Problem problem = problemRespository.findById(problemId).orElseThrow(
-                () -> new RuntimeException("Problem not found"));
+
+        Problem problem = problemRespository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("Problem not found"));
 
         return submissionRepository.findByProblem(problem);
     }
-
 }

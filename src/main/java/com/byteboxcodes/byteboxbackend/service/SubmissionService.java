@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.UUID;
 
 import com.byteboxcodes.byteboxbackend.dto.SubmissionRequest;
+import com.byteboxcodes.byteboxbackend.dto.SubmissionResponse;
 import com.byteboxcodes.byteboxbackend.entity.Submission;
 
 public interface SubmissionService {
 
-    Submission submitSolution(SubmissionRequest request);
+    SubmissionResponse submitSolution(SubmissionRequest request);
 
-    List<Submission> getSubmissionsByUser(UUID userId);
+    List<Submission> getSubmissionsByUser();
 
     List<Submission> getSubmissionsByProblem(UUID problemId);
 
