@@ -10,7 +10,7 @@ import com.byteboxcodes.byteboxbackend.entity.Problem;
 import com.byteboxcodes.byteboxbackend.entity.Topic;
 
 public interface ProblemRespository extends JpaRepository<Problem, UUID> {
-    List<Problem> findByDifficulty(Difficulty difficulty);;
+    List<Problem> findByDifficulty(Difficulty difficulty);
 
     List<Problem> findByTopic(Topic topic);
 

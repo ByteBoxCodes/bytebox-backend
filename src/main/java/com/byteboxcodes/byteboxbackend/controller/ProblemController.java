@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.byteboxcodes.byteboxbackend.dto.ProblemListResponse;
+import com.byteboxcodes.byteboxbackend.dto.ProblemResponse;
 import com.byteboxcodes.byteboxbackend.entity.Difficulty;
-import com.byteboxcodes.byteboxbackend.entity.Problem;
 import com.byteboxcodes.byteboxbackend.service.ProblemService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class ProblemController {
     private final ProblemService problemService;
 
     @GetMapping
-    public List<Problem> getProblems(@RequestParam(required = false) Difficulty difficulty,
+    public List<ProblemListResponse> getProblems(@RequestParam(required = false) Difficulty difficulty,
             @RequestParam(required = false) String topic) {
         if (difficulty != null) {
             return problemService.getProblemsByDifficulty(difficulty);
@@ -36,7 +37,7 @@ public class ProblemController {
     }
 
     @GetMapping("/{id}")
-    public Problem getProblemById(@PathVariable UUID id) {
+    public ProblemResponse getProblemById(@PathVariable UUID id) {
         return problemService.getProblemById(id);
     }
 
