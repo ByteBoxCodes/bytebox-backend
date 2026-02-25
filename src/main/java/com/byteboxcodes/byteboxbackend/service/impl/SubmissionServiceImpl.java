@@ -27,82 +27,115 @@ import lombok.RequiredArgsConstructor;
 
 public class SubmissionServiceImpl implements SubmissionService {
 
-    private final SubmissionRepository submissionRepository;
-    private final UserRepository userRepository;
-    private final ProblemRespository problemRespository;
-    private final JudgeService judgeService;
+        private final SubmissionRepository submissionRepository;
+        private final UserRepository userRepository;
+        private final ProblemRespository problemRespository;
+        private final JudgeService judgeService;
 
-    // 🔥 Submit Solution (JWT-secured)
-    @Override
-    public SubmissionResponse submitSolution(SubmissionRequest request) {
+        private void validateKeywords(Problem problem, String code) {
+                String requiredKeywords = problem.getRequiredKeywords();
+                if (requiredKeywords == null || requiredKeywords.isBlank()) {
+                        return;
+                }
+                String[] keywords = requiredKeywords.split(",");
 
-        // 1️⃣ Get authenticated user from JWT
-        String email = (String) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+                boolean matched = false;
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                for (String keyword : keywords) {
+                        if (code.contains(keyword.trim())) {
+                                matched = true;
+                                break;
+                        }
+                }
 
-        // 2️⃣ Fetch problem
-        Problem problem = problemRespository.findById(request.getProblemId())
-                .orElseThrow(() -> new RuntimeException("Problem not found"));
+                if (!matched) {
+                        throw new RuntimeException("Write code according to problem statement use instructions");
+                }
 
-        JudgeResult judgeResult = judgeService.judge(
-                problem.getId(),
-                request.getCode(),
-                request.getLanguage());
+        }
 
-        SubmissionStatus status = judgeResult.isAccepted()
-                ? SubmissionStatus.ACCEPTED
-                : SubmissionStatus.WRONG_ANSWER;
+        @Override
+        public JudgeResult runCode(SubmissionRequest request) {
 
-        // 4️⃣ Create submission entity
-        Submission submission = Submission.builder()
-                .user(user)
-                .problem(problem)
-                .code(request.getCode())
-                .language(request.getLanguage())
-                .status(status)
-                .totalTestCases(judgeResult.getTotalTestCases())
-                .passedTestCases(judgeResult.getPassedTestCases())
-                .submittedAt(LocalDateTime.now())
-                .build();
+                Problem problem = problemRespository.findById(request.getProblemId())
+                                .orElseThrow(() -> new RuntimeException("Problem not found"));
 
-        // 5️⃣ Save and return
-        submissionRepository.save(submission);
+                validateKeywords(problem, request.getCode());
 
-        return SubmissionResponse.builder()
-                .submissionId(submission.getId())
-                .status(status)
-                .totalTestCases(judgeResult.getTotalTestCases())
-                .passedTestCases(judgeResult.getPassedTestCases())
-                .build();
-    }
+                return judgeService.judgeSample(request.getProblemId(), request.getCode(), request.getLanguage());
+        }
 
-    // 🔥 Get submissions of logged-in user
-    @Override
-    public List<Submission> getSubmissionsByUser() {
+        // 🔥 Submit Solution (JWT-secured)
+        @Override
+        public SubmissionResponse submitSolution(SubmissionRequest request) {
 
-        String email = (String) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+                // 1️⃣ Get authenticated user from JWT
+                String email = (String) SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getPrincipal();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return submissionRepository.findByUser(user);
-    }
+                // 2️⃣ Fetch problem
+                Problem problem = problemRespository.findById(request.getProblemId())
+                                .orElseThrow(() -> new RuntimeException("Problem not found"));
 
-    // 🔥 Get submissions by problem
-    @Override
-    public List<Submission> getSubmissionsByProblem(UUID problemId) {
+                JudgeResult judgeResult = judgeService.judge(
+                                problem.getId(),
+                                request.getCode(),
+                                request.getLanguage());
 
-        Problem problem = problemRespository.findById(problemId)
-                .orElseThrow(() -> new RuntimeException("Problem not found"));
+                SubmissionStatus status = judgeResult.isAccepted()
+                                ? SubmissionStatus.ACCEPTED
+                                : SubmissionStatus.WRONG_ANSWER;
 
-        return submissionRepository.findByProblem(problem);
-    }
+                // 4️⃣ Create submission entity
+                Submission submission = Submission.builder()
+                                .user(user)
+                                .problem(problem)
+                                .code(request.getCode())
+                                .language(request.getLanguage())
+                                .status(status)
+                                .totalTestCases(judgeResult.getTotalTestCases())
+                                .passedTestCases(judgeResult.getPassedTestCases())
+                                .submittedAt(LocalDateTime.now())
+                                .build();
+
+                // 5️⃣ Save and return
+                submissionRepository.save(submission);
+
+                return SubmissionResponse.builder()
+                                .submissionId(submission.getId())
+                                .status(status)
+                                .totalTestCases(judgeResult.getTotalTestCases())
+                                .passedTestCases(judgeResult.getPassedTestCases())
+                                .build();
+        }
+
+        // 🔥 Get submissions of logged-in user
+        @Override
+        public List<Submission> getSubmissionsByUser() {
+
+                String email = (String) SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getPrincipal();
+
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                return submissionRepository.findByUser(user);
+        }
+
+        // 🔥 Get submissions by problem
+        @Override
+        public List<Submission> getSubmissionsByProblem(UUID problemId) {
+
+                Problem problem = problemRespository.findById(problemId)
+                                .orElseThrow(() -> new RuntimeException("Problem not found"));
+
+                return submissionRepository.findByProblem(problem);
+        }
 }

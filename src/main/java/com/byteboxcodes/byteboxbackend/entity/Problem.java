@@ -45,4 +45,7 @@ public class Problem {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "required_keywords")
+    private String requiredKeywords;
 }

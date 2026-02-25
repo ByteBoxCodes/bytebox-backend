@@ -9,6 +9,8 @@ import com.byteboxcodes.byteboxbackend.entity.TestCase;
 
 public interface TestCaseRepository extends JpaRepository<TestCase, UUID> {
 
+    List<TestCase> findByProblemIdAndIsSampleTrue(UUID problemId);
+
     List<TestCase> findByProblemId(UUID problemId);
 
 }
