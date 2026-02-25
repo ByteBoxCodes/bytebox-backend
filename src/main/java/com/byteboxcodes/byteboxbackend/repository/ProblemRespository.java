@@ -13,4 +13,5 @@ public interface ProblemRespository extends JpaRepository<Problem, UUID> {
     List<Problem> findByDifficulty(Difficulty difficulty);;
 
     List<Problem> findByTopic(Topic topic);
+
 }

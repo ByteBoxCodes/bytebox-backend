@@ -32,6 +32,9 @@ public class Problem {
     @Column(nullable = false)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
+    private String constraints;
+
     @Column(nullable = false)
     private String description;
 
@@ -48,4 +51,11 @@ public class Problem {
 
     @Column(name = "required_keywords")
     private String requiredKeywords;
+
+    @Column(name = "order_index")
+    private Integer orderIndex;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
 }
