@@ -3,11 +3,13 @@ package com.byteboxcodes.byteboxbackend.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.byteboxcodes.byteboxbackend.dto.JudgeResult;
+import com.byteboxcodes.byteboxbackend.dto.SubmissionListResponse;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionRequest;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionResponse;
 import com.byteboxcodes.byteboxbackend.entity.Problem;
@@ -119,7 +121,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         // 🔥 Get submissions of logged-in user
         @Override
-        public List<Submission> getSubmissionsByUser() {
+        public List<SubmissionListResponse> getSubmissionsByUser() {
 
                 String email = (String) SecurityContextHolder
                                 .getContext()
@@ -129,16 +131,42 @@ public class SubmissionServiceImpl implements SubmissionService {
                 User user = userRepository.findByEmail(email)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-                return submissionRepository.findByUser(user);
+                return submissionRepository.findByUser(user)
+                                .stream()
+                                .map(SubmissionListResponse::fromEntity)
+                                .collect(Collectors.toList());
         }
 
         // 🔥 Get submissions by problem
         @Override
-        public List<Submission> getSubmissionsByProblem(UUID problemId) {
+        public List<SubmissionListResponse> getSubmissionsByProblem(UUID problemId) {
 
                 Problem problem = problemRespository.findById(problemId)
                                 .orElseThrow(() -> new RuntimeException("Problem not found"));
 
-                return submissionRepository.findByProblem(problem);
+                return submissionRepository.findByProblem(problem)
+                                .stream()
+                                .map(SubmissionListResponse::fromEntity)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        public List<SubmissionListResponse> getMySubmissionsByProblemId(UUID problemId) {
+
+                String email = (String) SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                                .getPrincipal();
+
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                Problem problem = problemRespository.findById(problemId)
+                                .orElseThrow(() -> new RuntimeException("Problem not found"));
+
+                return submissionRepository.findByUserIdAndProblemId(user.getId(), problem.getId())
+                                .stream()
+                                .map(SubmissionListResponse::fromEntity)
+                                .collect(Collectors.toList());
         }
 }

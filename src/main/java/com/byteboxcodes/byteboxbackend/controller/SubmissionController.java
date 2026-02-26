@@ -3,10 +3,9 @@ package com.byteboxcodes.byteboxbackend.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.byteboxcodes.byteboxbackend.dto.JudgeResult;
+import com.byteboxcodes.byteboxbackend.dto.SubmissionListResponse;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionRequest;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionResponse;
-import com.byteboxcodes.byteboxbackend.entity.Submission;
 import com.byteboxcodes.byteboxbackend.service.SubmissionService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,13 +36,18 @@ public class SubmissionController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<Submission> getSubmissionsByUserId(@PathVariable UUID userId) {
+    public List<SubmissionListResponse> getSubmissionsByUserId(@PathVariable UUID userId) {
         return submissionService.getSubmissionsByUser();
     }
 
     @GetMapping("/problem/{problemId}")
-    public List<Submission> getSubmissionsByProblemId(@PathVariable UUID problemId) {
+    public List<SubmissionListResponse> getSubmissionsByProblemId(@PathVariable UUID problemId) {
         return submissionService.getSubmissionsByProblem(problemId);
+    }
+
+    @GetMapping("/problem/{problemId}/my")
+    public List<SubmissionListResponse> getMySubmissionsByProblemId(@PathVariable UUID problemId) {
+        return submissionService.getMySubmissionsByProblemId(problemId);
     }
 
 }
