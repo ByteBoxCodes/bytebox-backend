@@ -26,10 +26,10 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @PostMapping("/run")
-    public JudgeResult run(@RequestBody SubmissionRequest request) {
-        return submissionService.runCode(request);
-    }
+    // @PostMapping("/run")
+    // public JudgeResult run(@RequestBody SubmissionRequest request) {
+    // return submissionService.runCode(request);
+    // }
 
     @PostMapping("/submit")
     public SubmissionResponse submit(@RequestBody SubmissionRequest request) {

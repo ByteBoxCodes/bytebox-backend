@@ -13,6 +13,9 @@ public class SubmissionResponse {
 
     private UUID submissionId;
     private SubmissionStatus status;
-    private String totalTestCases;
-    private String passedTestCases;
+    private int totalTestCases;
+    private int passedTestCases;
+
+    private String errorType;
+    private String errorMessage;
 }

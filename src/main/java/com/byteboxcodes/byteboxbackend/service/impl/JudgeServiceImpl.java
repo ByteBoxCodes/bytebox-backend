@@ -1,14 +1,23 @@
 package com.byteboxcodes.byteboxbackend.service.impl;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
+import com.byteboxcodes.byteboxbackend.dto.Judge0Request;
+import com.byteboxcodes.byteboxbackend.dto.Judge0Response;
 import com.byteboxcodes.byteboxbackend.dto.JudgeResult;
 import com.byteboxcodes.byteboxbackend.entity.TestCase;
 import com.byteboxcodes.byteboxbackend.repository.TestCaseRepository;
-import com.byteboxcodes.byteboxbackend.service.CodeExecutionService;
 import com.byteboxcodes.byteboxbackend.service.JudgeService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,63 +27,92 @@ import lombok.RequiredArgsConstructor;
 public class JudgeServiceImpl implements JudgeService {
 
     private final TestCaseRepository testCaseRepository;
-    private final CodeExecutionService codeExecutionService;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    @Override
-    public JudgeResult judgeSample(UUID problemId, String code, String language) {
-        List<TestCase> testCases = testCaseRepository.findByProblemIdAndIsSampleTrue(problemId);
-        int passed = 0;
-        for (TestCase testCase : testCases) {
-            String output = codeExecutionService.execute(code, language, testCase.getInput());
+    @Value("${JUDGE0_API_KEY}")
+    private String rapidApiKey;
 
-            if (!output.trim().equals(testCase.getExpectedOutput().trim())) {
-                return JudgeResult.builder()
-                        .accepted(false)
-                        .totalTestCases(String.valueOf(testCases.size()))
-                        .passedTestCases(String.valueOf(passed))
-                        .errorMessage("Wrong Answer on test case " + (passed + 1))
-                        .build();
-            }
+    private String encode(String val) {
+        return Base64.getEncoder().encodeToString(val.getBytes());
+    }
 
-            passed++;
+    private String decode(String val) {
+        if (val == null)
+            return null;
+        return new String(Base64.getDecoder().decode(val));
+    }
 
-        }
-
-        return JudgeResult.builder()
-                .accepted(true)
-                .totalTestCases(String.valueOf(testCases.size()))
-                .passedTestCases(String.valueOf(passed))
-                .build();
+    private Integer getLanguageId(String language) {
+        return switch (language.toUpperCase()) {
+            case "JAVA" -> 62;
+            case "PYTHON" -> 71;
+            case "C++" -> 54;
+            default -> throw new RuntimeException("Unsupported language");
+        };
     }
 
     @Override
     public JudgeResult judge(UUID problemId, String code, String language) {
+
         List<TestCase> testCases = testCaseRepository.findByProblemId(problemId);
 
         int passed = 0;
+        int total = testCases.size();
+
+        final String url = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true";
 
         for (TestCase testCase : testCases) {
-            String output = codeExecutionService.execute(code, language, testCase.getInput());
 
-            if (!output.trim().equals(testCase.getExpectedOutput().trim())) {
-                return JudgeResult.builder()
-                        .accepted(false)
-                        .totalTestCases(String.valueOf(testCases.size()))
-                        .passedTestCases(String.valueOf(passed))
-                        .errorMessage("Wrong Answer")
-                        .build();
+            Judge0Request requestBody = Judge0Request.builder()
+                    .language_id(getLanguageId(language))
+                    .source_code(encode(code))
+                    .stdin(encode(testCase.getInput()))
+                    .expected_output(encode(testCase.getExpectedOutput()))
+                    .build();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-RapidAPI-Key", rapidApiKey);
+            headers.set("X-RapidAPI-Host", "judge0-ce.p.rapidapi.com");
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Judge0Request> entity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<Judge0Response> response;
+
+            try {
+                response = restTemplate.postForEntity(
+                        url,
+                        entity,
+                        Judge0Response.class);
+            } catch (HttpClientErrorException e) {
+                return JudgeResult.runtimeError(
+                        "Judge0 API Error: " + e.getResponseBodyAsString(), total, passed);
+            }
+
+            Judge0Response body = response.getBody();
+
+            if (body == null) {
+                return JudgeResult.runtimeError("No response from Judge0", total, passed);
+            }
+
+            if (body.getCompile_output() != null) {
+                return JudgeResult.compileError(
+                        decode(body.getCompile_output()), total, passed);
+            }
+
+            if (body.getStderr() != null) {
+                return JudgeResult.runtimeError(
+                        decode(body.getStderr()), total, passed);
+            }
+
+            if (!"Accepted".equalsIgnoreCase(
+                    body.getStatus().getDescription())) {
+                return JudgeResult.wrongAnswer(total, passed);
             }
 
             passed++;
-
         }
 
-        return JudgeResult.builder()
-                .accepted(true)
-                .totalTestCases(String.valueOf(testCases.size()))
-                .passedTestCases(String.valueOf(passed))
-                .build();
-
+        return JudgeResult.success(total, passed);
     }
-
 }

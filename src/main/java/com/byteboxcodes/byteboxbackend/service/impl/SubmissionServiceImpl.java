@@ -54,16 +54,17 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         }
 
-        @Override
-        public JudgeResult runCode(SubmissionRequest request) {
+        // @Override
+        // public JudgeResult runCode(SubmissionRequest request) {
 
-                Problem problem = problemRespository.findById(request.getProblemId())
-                                .orElseThrow(() -> new RuntimeException("Problem not found"));
+        // Problem problem = problemRespository.findById(request.getProblemId())
+        // .orElseThrow(() -> new RuntimeException("Problem not found"));
 
-                validateKeywords(problem, request.getCode());
+        // validateKeywords(problem, request.getCode());
 
-                return judgeService.judgeSample(request.getProblemId(), request.getCode(), request.getLanguage());
-        }
+        // return judgeService.judgeSample(request.getProblemId(), request.getCode(),
+        // request.getLanguage());
+        // }
 
         // 🔥 Submit Solution (JWT-secured)
         @Override
@@ -111,6 +112,8 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 .status(status)
                                 .totalTestCases(judgeResult.getTotalTestCases())
                                 .passedTestCases(judgeResult.getPassedTestCases())
+                                .errorType(judgeResult.getErrorType())
+                                .errorMessage(judgeResult.getErrorMessage())
                                 .build();
         }
 

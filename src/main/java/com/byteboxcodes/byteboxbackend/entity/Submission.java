@@ -47,10 +47,10 @@ public class Submission {
     private String language;
 
     @Column(nullable = false)
-    private String totalTestCases;
+    private Integer totalTestCases;
 
     @Column(nullable = false)
-    private String passedTestCases;
+    private Integer passedTestCases;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
