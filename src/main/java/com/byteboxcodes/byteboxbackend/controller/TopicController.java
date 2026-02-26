@@ -19,6 +19,6 @@ public class TopicController {
 
     @GetMapping
     public List<TopicResponse> getAllTopics() {
-        return topicService.getAllTopicsWithProblemCount();
+        return topicService.getAllTopics();
     }
 }
