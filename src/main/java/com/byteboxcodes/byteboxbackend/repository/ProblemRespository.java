@@ -14,4 +14,5 @@ public interface ProblemRespository extends JpaRepository<Problem, UUID> {
 
     List<Problem> findByTopic(Topic topic);
 
+    List<Problem> findByIsActiveTrueOrderByOrderIndexAsc();
 }

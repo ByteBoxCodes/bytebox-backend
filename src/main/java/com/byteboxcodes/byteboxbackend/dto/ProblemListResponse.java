@@ -12,4 +12,5 @@ public class ProblemListResponse {
     private String title;
     private String difficulty;
     private Integer orderIndex;
+    private boolean isSolved;
 }
