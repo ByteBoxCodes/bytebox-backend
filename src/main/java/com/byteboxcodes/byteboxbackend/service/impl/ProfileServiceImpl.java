@@ -97,6 +97,21 @@ public class ProfileServiceImpl implements ProfileService {
 
         long totalProblems = problemRespository.countByIsActiveTrue();
 
+        List<Object[]> totalDifficultyStats = problemRespository.countActiveProblemsGroupedByDifficulty();
+
+        long totalEasy = 0, totalMedium = 0, totalHard = 0;
+
+        for (Object[] row : totalDifficultyStats) {
+            Difficulty difficulty = (Difficulty) row[0];
+            long count = (Long) row[1];
+
+            switch (difficulty) {
+                case EASY -> totalEasy = count;
+                case MEDIUM -> totalMedium = count;
+                case HARD -> totalHard = count;
+            }
+        }
+
         List<Object[]> difficultyStats = submissionRepository.countSolvedByDifficulty(userId);
 
         long easy = 0, medium = 0, hard = 0;
@@ -138,8 +153,11 @@ public class ProfileServiceImpl implements ProfileService {
                 .totalProblems(totalProblems)
                 .totalSolvedProblems(totalSolved)
                 .easySolved(easy)
+                .totalEasy(totalEasy)
                 .mediumSolved(medium)
+                .totalMedium(totalMedium)
                 .hardSolved(hard)
+                .totalHard(totalHard)
                 .acceptanceRate(Math.round(acceptanceRate))
                 .currentStreak(streak)
                 .maxStreak(maxStreak)

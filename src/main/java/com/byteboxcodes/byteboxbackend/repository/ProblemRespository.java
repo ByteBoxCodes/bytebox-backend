@@ -17,6 +17,16 @@ public interface ProblemRespository extends JpaRepository<Problem, UUID> {
 
     long countByIsActiveTrue();
 
+    long countByDifficultyAndIsActiveTrue(Difficulty difficulty);
+
+    @Query("""
+            SELECT p.difficulty, COUNT(p)
+            FROM Problem p
+            WHERE p.isActive = true
+            GROUP BY p.difficulty
+            """)
+    List<Object[]> countActiveProblemsGroupedByDifficulty();
+
     @Query("""
             SELECT p.topic.id, COUNT(p)
             FROM Problem p

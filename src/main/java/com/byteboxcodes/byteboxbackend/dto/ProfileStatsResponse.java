@@ -24,8 +24,11 @@ public class ProfileStatsResponse {
     private List<HeatMapDTO> heatmap;
 
     private long easySolved;
+    private long totalEasy;
     private long mediumSolved;
+    private long totalMedium;
     private long hardSolved;
+    private long totalHard;
 
     private double acceptanceRate;
 }
