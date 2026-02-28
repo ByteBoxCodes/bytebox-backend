@@ -14,6 +14,7 @@ import com.byteboxcodes.byteboxbackend.dto.ProfileStatsResponse;
 import com.byteboxcodes.byteboxbackend.entity.Difficulty;
 import com.byteboxcodes.byteboxbackend.entity.SubmissionStatus;
 import com.byteboxcodes.byteboxbackend.entity.User;
+import com.byteboxcodes.byteboxbackend.repository.ProblemRespository;
 import com.byteboxcodes.byteboxbackend.repository.SubmissionRepository;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.service.ProfileService;
@@ -26,6 +27,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
+    private final ProblemRespository problemRespository;
 
     // Calculating the streak of the user
     private int calculateStreak(List<LocalDate> dates) {
@@ -93,6 +95,8 @@ public class ProfileServiceImpl implements ProfileService {
 
         long totalSolved = submissionRepository.countSolvedProblems(userId);
 
+        long totalProblems = problemRespository.countByIsActiveTrue();
+
         List<Object[]> difficultyStats = submissionRepository.countSolvedByDifficulty(userId);
 
         long easy = 0, medium = 0, hard = 0;
@@ -131,6 +135,7 @@ public class ProfileServiceImpl implements ProfileService {
         return ProfileStatsResponse.builder()
                 .totalSubmissions(totalSubmissions)
                 .acceptedSubmissions(acceptedSubmissions)
+                .totalProblems(totalProblems)
                 .totalSolvedProblems(totalSolved)
                 .easySolved(easy)
                 .mediumSolved(medium)

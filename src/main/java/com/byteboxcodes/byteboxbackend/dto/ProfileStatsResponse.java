@@ -16,6 +16,7 @@ public class ProfileStatsResponse {
     private long totalSubmissions;
     private long acceptedSubmissions;
 
+    private long totalProblems;
     private long totalSolvedProblems;
 
     private int currentStreak;

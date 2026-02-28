@@ -15,6 +15,8 @@ public interface ProblemRespository extends JpaRepository<Problem, UUID> {
 
     List<Problem> findByTopic(Topic topic);
 
+    long countByIsActiveTrue();
+
     @Query("""
             SELECT p.topic.id, COUNT(p)
             FROM Problem p
