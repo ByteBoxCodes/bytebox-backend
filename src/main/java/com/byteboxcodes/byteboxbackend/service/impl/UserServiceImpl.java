@@ -17,6 +17,7 @@ import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.security.JwtUtil;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -81,39 +82,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateProfile(ProfileUpdateRequest request) {
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (request.getBio() != null) {
+        if (request.getBio() != null)
             user.setBio(request.getBio());
-        }
-
-        if (request.getName() != null) {
+        if (request.getName() != null)
             user.setName(request.getName());
-        }
-
-        if (request.getAvatarUrl() != null) {
+        if (request.getAvatarUrl() != null)
             user.setAvatarUrl(request.getAvatarUrl());
-        }
-
-        if (request.getGithubUsername() != null) {
+        if (request.getGithubUsername() != null)
             user.setGithubUsername(request.getGithubUsername());
-        }
-
-        if (request.getLinkedinUsername() != null) {
+        if (request.getLinkedinUsername() != null)
             user.setLinkedinUsername(request.getLinkedinUsername());
-        }
-
-        if (request.getTwitterUsername() != null) {
+        if (request.getTwitterUsername() != null)
             user.setTwitterUsername(request.getTwitterUsername());
-        }
-
-        if (request.getWebsiteUrl() != null) {
+        if (request.getWebsiteUrl() != null)
             user.setWebsiteUrl(request.getWebsiteUrl());
-        }
+        if (request.getInstagramUsername() != null)
+            user.setInstagramUsername(request.getInstagramUsername());
 
         userRepository.save(user);
     }
