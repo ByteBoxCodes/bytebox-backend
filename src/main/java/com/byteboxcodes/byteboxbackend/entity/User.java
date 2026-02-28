@@ -44,5 +44,23 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(name = "bio", columnDefinition = "TEXT")
+    private String bio;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "github_username")
+    private String githubUsername;
+
+    @Column(name = "linkedin_username")
+    private String linkedinUsername;
+
+    @Column(name = "twitter_username")
+    private String twitterUsername;
+
+    @Column(name = "website_url")
+    private String websiteUrl;
+
     private LocalDateTime createdAt;
 }

@@ -7,6 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
+import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
+import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserResponse;
 import com.byteboxcodes.byteboxbackend.entity.User;
@@ -60,17 +62,55 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getCurrentUser() {
+    public PublicProfileResponse getCurrentUser() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return UserResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
+        return PublicProfileResponse.builder()
                 .username(user.getUsername())
                 .name(user.getName())
-                .role(user.getRole())
+                .bio(user.getBio())
+                .avatarUrl(user.getAvatarUrl())
+                .githubUrl(user.getGithubUsername())
+                .linkedinUrl(user.getLinkedinUsername())
+                .twitterUrl(user.getTwitterUsername())
+                .websiteUrl(user.getWebsiteUrl())
+                .createdAt(user.getCreatedAt().toString())
                 .build();
+    }
+
+    @Override
+    public void updateProfile(ProfileUpdateRequest request) {
+
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+
+        if (request.getAvatarUrl() != null) {
+            user.setAvatarUrl(request.getAvatarUrl());
+        }
+
+        if (request.getGithubUsername() != null) {
+            user.setGithubUsername(request.getGithubUsername());
+        }
+
+        if (request.getLinkedinUsername() != null) {
+            user.setLinkedinUsername(request.getLinkedinUsername());
+        }
+
+        if (request.getTwitterUsername() != null) {
+            user.setTwitterUsername(request.getTwitterUsername());
+        }
+
+        if (request.getWebsiteUrl() != null) {
+            user.setWebsiteUrl(request.getWebsiteUrl());
+        }
+
+        userRepository.save(user);
     }
 
 }
