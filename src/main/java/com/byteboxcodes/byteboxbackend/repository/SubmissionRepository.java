@@ -1,5 +1,6 @@
 package com.byteboxcodes.byteboxbackend.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,4 +37,45 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
         List<Object[]> countSolvedProblemsGroupedByTopic(
                         UUID userId,
                         SubmissionStatus status);
+
+        long countByUser_Id(UUID userId);
+
+        long countByUser_IdAndStatus(UUID userId, SubmissionStatus status);
+
+        @Query("""
+                        SELECT COUNT(DISTINCT s.problem.id)
+                        FROM Submission s
+                        WHERE s.user.id = :userId
+                        AND s.status = 'ACCEPTED'
+                        """)
+        long countSolvedProblems(UUID userId);
+
+        @Query("""
+                            SELECT s.problem.difficulty, COUNT(DISTINCT s.problem.id)
+                            FROM Submission s
+                            WHERE s.user.id = :userId
+                            AND s.status = 'ACCEPTED'
+                            GROUP BY s.problem.difficulty
+                        """)
+        List<Object[]> countSolvedByDifficulty(UUID userId);
+
+        @Query("""
+                            SELECT DATE(s.submittedAt)
+                            FROM Submission s
+                            WHERE s.user.id = :userId
+                            AND s.status = 'ACCEPTED'
+                            GROUP BY DATE(s.submittedAt)
+                            ORDER BY DATE(s.submittedAt)
+                        """)
+        List<LocalDate> findAcceptedSubmissionDates(UUID userId);
+
+        @Query("""
+                            SELECT DATE(s.submittedAt), COUNT(s.id)
+                            FROM Submission s
+                            WHERE s.user.id = :userId
+                            AND s.status = 'ACCEPTED'
+                            GROUP BY DATE(s.submittedAt)
+                            ORDER BY DATE(s.submittedAt)
+                        """)
+        List<Object[]> getHeatmapData(UUID userId);
 }

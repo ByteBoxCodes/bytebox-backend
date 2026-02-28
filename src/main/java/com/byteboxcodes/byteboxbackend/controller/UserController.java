@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
+import com.byteboxcodes.byteboxbackend.dto.ProfileStatsResponse;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserResponse;
+import com.byteboxcodes.byteboxbackend.service.ProfileService;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UserController {
 
     private final UserService userService;
+    private final ProfileService profileService;
 
     @PostMapping("/register")
     public ApiResponse<String> register(@RequestBody UserRequest request) {
@@ -71,6 +74,16 @@ public class UserController {
                 .success(true)
                 .message("Profile fetched successfully")
                 .data(user)
+                .build();
+    }
+
+    @GetMapping("/me/stats")
+    public ApiResponse<ProfileStatsResponse> getProfileStats() {
+        ProfileStatsResponse stats = profileService.getProfileStats();
+        return ApiResponse.<ProfileStatsResponse>builder()
+                .success(true)
+                .message("Profile stats fetched successfully")
+                .data(stats)
                 .build();
     }
 
