@@ -16,9 +16,10 @@ public class PublicProfileResponse {
     private String bio;
     private String avatarUrl;
 
-    private String githubUrl;
-    private String linkedinUrl;
-    private String twitterUrl;
+    private String githubUsername;
+    private String linkedinUsername;
+    private String twitterUsername;
     private String websiteUrl;
+    private String instagramUsername;
     private String createdAt;
 }

@@ -44,7 +44,7 @@ public class User {
     @Column(nullable = false)
     private String role;
 
-    @Column(name = "bio", columnDefinition = "TEXT")
+    @Column(name = "bio", columnDefinition = "TEXT", length = 150)
     private String bio;
 
     @Column(name = "avatar_url")
@@ -61,6 +61,9 @@ public class User {
 
     @Column(name = "website_url")
     private String websiteUrl;
+
+    @Column(name = "instagram_username")
+    private String instagramUsername;
 
     private LocalDateTime createdAt;
 }

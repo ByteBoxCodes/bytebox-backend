@@ -71,10 +71,11 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .bio(user.getBio())
                 .avatarUrl(user.getAvatarUrl())
-                .githubUrl(user.getGithubUsername())
-                .linkedinUrl(user.getLinkedinUsername())
-                .twitterUrl(user.getTwitterUsername())
+                .githubUsername(user.getGithubUsername())
+                .linkedinUsername(user.getLinkedinUsername())
+                .twitterUsername(user.getTwitterUsername())
                 .websiteUrl(user.getWebsiteUrl())
+                .instagramUsername(user.getInstagramUsername())
                 .createdAt(user.getCreatedAt().toString())
                 .build();
     }
@@ -88,6 +89,10 @@ public class UserServiceImpl implements UserService {
 
         if (request.getBio() != null) {
             user.setBio(request.getBio());
+        }
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
         }
 
         if (request.getAvatarUrl() != null) {

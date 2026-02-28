@@ -12,7 +12,6 @@ import com.byteboxcodes.byteboxbackend.dto.ProfileStatsResponse;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
-import com.byteboxcodes.byteboxbackend.dto.UserResponse;
 import com.byteboxcodes.byteboxbackend.service.ProfileService;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 

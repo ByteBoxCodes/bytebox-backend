@@ -35,8 +35,8 @@ public class SubmissionController {
         return submissionService.submitSolution(request);
     }
 
-    @GetMapping("/user/{userId}")
-    public List<SubmissionListResponse> getSubmissionsByUserId(@PathVariable UUID userId) {
+    @GetMapping("/user/my")
+    public List<SubmissionListResponse> getSubmissionsByUserId() {
         return submissionService.getSubmissionsByUser();
     }
 
