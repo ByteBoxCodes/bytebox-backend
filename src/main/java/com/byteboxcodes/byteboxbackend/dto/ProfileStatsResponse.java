@@ -30,5 +30,7 @@ public class ProfileStatsResponse {
     private long hardSolved;
     private long totalHard;
 
+    private List<String> languages;
+
     private double acceptanceRate;
 }

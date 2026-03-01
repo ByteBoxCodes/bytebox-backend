@@ -143,6 +143,8 @@ public class ProfileServiceImpl implements ProfileService {
 
         int maxStreak = calculateMaxStreak(activeDates);
 
+        List<String> languages = submissionRepository.findDistinctLanguagesByUserId(userId);
+
         double acceptanceRate = totalSubmissions == 0
                 ? 0
                 : ((double) acceptedSubmissions / totalSubmissions) * 100;
@@ -161,6 +163,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .acceptanceRate(Math.round(acceptanceRate))
                 .currentStreak(streak)
                 .maxStreak(maxStreak)
+                .languages(languages)
                 .heatmap(heatmap)
                 .build();
     }
