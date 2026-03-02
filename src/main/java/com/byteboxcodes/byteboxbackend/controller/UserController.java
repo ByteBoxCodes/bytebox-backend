@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
+import com.byteboxcodes.byteboxbackend.dto.VerifyRequest;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -51,10 +52,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
-        userService.verifyEmail(token);
-        return ResponseEntity.ok("Email verified successfully");
+    @PostMapping("/verify")
+    public ApiResponse<String> verifyEmail(@RequestBody VerifyRequest request) {
+        userService.verifyEmail(request.getToken());
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Email verified successfully")
+                .data("Email verified successfully")
+                .build();
     }
 
 }
