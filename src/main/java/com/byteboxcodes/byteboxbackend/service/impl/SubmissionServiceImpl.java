@@ -1,6 +1,9 @@
 package com.byteboxcodes.byteboxbackend.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,6 +25,7 @@ import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.service.JudgeService;
 import com.byteboxcodes.byteboxbackend.service.SubmissionService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -56,6 +60,31 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         }
 
+        private void updateUserStreak(User user) {
+
+                LocalDate today = LocalDate.now(ZoneId.of("Asia/Kolkata"));
+
+                LocalDate lastDate = user.getLastAcceptedDate();
+
+                if (lastDate == null) {
+                        user.setCurrentStreak(1);
+                } else {
+                        long diff = ChronoUnit.DAYS.between(lastDate, today);
+
+                        if (diff == 1) {
+                                user.setCurrentStreak(user.getCurrentStreak() + 1);
+                        } else if (diff > 1) {
+                                user.setCurrentStreak(1);
+                        }
+                }
+
+                if (user.getCurrentStreak() > user.getMaxStreak()) {
+                        user.setMaxStreak(user.getCurrentStreak());
+                }
+
+                user.setLastAcceptedDate(today);
+        }
+
         // @Override
         // public JudgeResult runCode(SubmissionRequest request) {
 
@@ -70,6 +99,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         // 🔥 Submit Solution (JWT-secured)
         @Override
+        @Transactional
         public SubmissionResponse submitSolution(SubmissionRequest request) {
 
                 // 1️⃣ Get authenticated user from JWT
@@ -93,6 +123,10 @@ public class SubmissionServiceImpl implements SubmissionService {
                 SubmissionStatus status = judgeResult.isAccepted()
                                 ? SubmissionStatus.ACCEPTED
                                 : SubmissionStatus.WRONG_ANSWER;
+
+                if (judgeResult.isAccepted()) {
+                        updateUserStreak(user);
+                }
 
                 // 4️⃣ Create submission entity
                 Submission submission = Submission.builder()

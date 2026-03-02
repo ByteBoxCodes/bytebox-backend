@@ -19,8 +19,8 @@ public class ProfileStatsResponse {
     private long totalProblems;
     private long totalSolvedProblems;
 
-    private int currentStreak;
-    private int maxStreak;
+    private Integer currentStreak;
+    private Integer maxStreak;
     private List<HeatMapDTO> heatmap;
 
     private long easySolved;

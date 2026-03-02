@@ -1,6 +1,9 @@
 package com.byteboxcodes.byteboxbackend.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -65,5 +68,45 @@ public class User {
     @Column(name = "instagram_username")
     private String instagramUsername;
 
+    @Builder.Default
+    @Column(name = "current_streak")
+    private Integer currentStreak = 0;
+
+    @Builder.Default
+    @Column(name = "max_streak")
+    private Integer maxStreak = 0;
+
+    @Column(name = "last_accepted_date")
+    private LocalDate lastAcceptedDate;
+
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
+
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified;
+
     private LocalDateTime createdAt;
+
+    public Integer getCurrentStreak() {
+        return currentStreak == null ? 0 : currentStreak;
+    }
+
+    public Integer getEffectiveCurrentStreak() {
+        if (currentStreak == null || currentStreak == 0)
+            return 0;
+        if (lastAcceptedDate == null)
+            return 0;
+
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Kolkata"));
+        long diff = ChronoUnit.DAYS.between(lastAcceptedDate, today);
+
+        if (diff > 1) {
+            return 0;
+        }
+        return currentStreak;
+    }
+
+    public Integer getMaxStreak() {
+        return maxStreak == null ? 0 : maxStreak;
+    }
 }

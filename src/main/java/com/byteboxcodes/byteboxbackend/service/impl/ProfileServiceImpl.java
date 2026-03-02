@@ -1,14 +1,13 @@
 package com.byteboxcodes.byteboxbackend.service.impl;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.byteboxcodes.byteboxbackend.dto.HeaderProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.HeatMapDTO;
 import com.byteboxcodes.byteboxbackend.dto.ProfileStatsResponse;
 import com.byteboxcodes.byteboxbackend.entity.Difficulty;
@@ -28,51 +27,6 @@ public class ProfileServiceImpl implements ProfileService {
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final ProblemRespository problemRespository;
-
-    // Calculating the streak of the user
-    private int calculateStreak(List<LocalDate> dates) {
-
-        if (dates.isEmpty())
-            return 0;
-
-        Set<LocalDate> dateSet = new HashSet<>(dates);
-
-        LocalDate today = LocalDate.now();
-        int streak = 0;
-
-        while (dateSet.contains(today.minusDays(streak))) {
-            streak++;
-        }
-
-        return streak;
-    }
-
-    private int calculateMaxStreak(List<LocalDate> dates) {
-
-        if (dates.isEmpty())
-            return 0;
-
-        Set<LocalDate> dateSet = new HashSet<>(dates);
-
-        LocalDate today = LocalDate.now();
-        int maxStreak = 0;
-        int currentStreak = 0;
-
-        for (int i = 0; i < 365; i++) {
-            LocalDate checkDate = today.minusDays(i);
-
-            if (dateSet.contains(checkDate)) {
-                currentStreak++;
-            } else {
-                maxStreak = Math.max(maxStreak, currentStreak);
-                currentStreak = 0;
-            }
-        }
-
-        maxStreak = Math.max(maxStreak, currentStreak);
-
-        return maxStreak;
-    }
 
     @Override
     public ProfileStatsResponse getProfileStats() {
@@ -135,13 +89,9 @@ public class ProfileServiceImpl implements ProfileService {
                         (Long) row[1]))
                 .toList();
 
-        List<LocalDate> activeDates = heatmap.stream()
-                .map(HeatMapDTO::getDate)
-                .toList();
+        int streak = user.getEffectiveCurrentStreak();
 
-        int streak = calculateStreak(activeDates);
-
-        int maxStreak = calculateMaxStreak(activeDates);
+        int maxStreak = user.getMaxStreak();
 
         List<String> languages = submissionRepository.findDistinctLanguagesByUserId(userId);
 
@@ -165,6 +115,26 @@ public class ProfileServiceImpl implements ProfileService {
                 .maxStreak(maxStreak)
                 .languages(languages)
                 .heatmap(heatmap)
+                .build();
+    }
+
+    @Override
+    public HeaderProfileResponse getHeaderDetails() {
+
+        String email = (String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return HeaderProfileResponse.builder()
+                .username(user.getUsername())
+                .name(user.getName())
+                .avatarUrl(user.getAvatarUrl())
+                .currentStreak(user.getEffectiveCurrentStreak())
+                .maxStreak(user.getMaxStreak())
                 .build();
     }
 

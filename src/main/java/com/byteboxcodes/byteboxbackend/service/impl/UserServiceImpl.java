@@ -1,6 +1,7 @@
 package com.byteboxcodes.byteboxbackend.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,11 +11,13 @@ import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
-import com.byteboxcodes.byteboxbackend.dto.UserResponse;
+import com.byteboxcodes.byteboxbackend.entity.EmailVerification;
 import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.exception.UserAlreadyExists;
+import com.byteboxcodes.byteboxbackend.repository.EmailRespository;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.security.JwtUtil;
+import com.byteboxcodes.byteboxbackend.service.EmailService;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
 import jakarta.transaction.Transactional;
@@ -27,8 +30,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailRespository emailVerificationRepository;
+    private final EmailService emailService;
 
     @Override
+    @Transactional
     public void register(UserRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -48,6 +54,18 @@ public class UserServiceImpl implements UserService {
                 .createdAt(LocalDateTime.now())
                 .build();
         userRepository.save(user);
+
+        String token = UUID.randomUUID().toString();
+
+        EmailVerification emailVerificationToken = EmailVerification.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusHours(1))
+                .build();
+        emailVerificationRepository.save(emailVerificationToken);
+
+        emailService.sendVerificationEmail(user.getEmail(), token);
+
     }
 
     @Override
@@ -57,6 +75,10 @@ public class UserServiceImpl implements UserService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid Credentials");
+        }
+
+        if (!user.isEmailVerified()) {
+            throw new RuntimeException("Email not verified");
         }
 
         return jwtUtil.generateToken(user.getEmail());
@@ -107,6 +129,24 @@ public class UserServiceImpl implements UserService {
             user.setInstagramUsername(request.getInstagramUsername());
 
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmail(String token) {
+        EmailVerification verificationToken = emailVerificationRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expired");
+        }
+
+        User user = verificationToken.getUser();
+        user.setEnabled(true);
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        emailVerificationRepository.delete(verificationToken);
     }
 
 }

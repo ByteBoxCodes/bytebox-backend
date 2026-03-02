@@ -15,4 +15,6 @@ public interface UserService {
 
     void updateProfile(ProfileUpdateRequest request);
 
+    void verifyEmail(String token);
+
 }
