@@ -35,8 +35,11 @@ public class Problem {
     @Column(columnDefinition = "TEXT")
     private String constraints;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String instructions;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -16,6 +16,7 @@ public class ProblemResponse {
     private String description;
     private String difficulty;
     private String constraints;
+    private String instructions;
     private String requiredKeywords;
     private Integer orderIndex;
     private Boolean isActive;

@@ -108,6 +108,9 @@ public class ProblemServiceImpl implements ProblemService {
                                                 problem.getTopic().getDescription(),
                                                 0L))
                                 .sampleTestCases(sampleTestCases)
+                                .instructions(problem.getInstructions())
+                                .orderIndex(problem.getOrderIndex())
+                                .isActive(problem.getIsActive())
                                 .build();
 
         }
