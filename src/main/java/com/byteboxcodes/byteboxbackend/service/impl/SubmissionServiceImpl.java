@@ -120,11 +120,22 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 request.getCode(),
                                 request.getLanguage());
 
-                boolean accepted = "ACCEPTED".equals(judgeResult.getStatus());
+                String judgeStatus = judgeResult.getStatus();
 
+                // 3️⃣ Compile/Runtime errors — return immediately, don't save submission
+                if ("COMPILE_ERROR".equals(judgeStatus) || "RUNTIME_ERROR".equals(judgeStatus)) {
+                        return SubmissionResponse.builder()
+                                        .status(SubmissionStatus.valueOf(judgeStatus))
+                                        .passedTestCases(judgeResult.getPassedTestCases())
+                                        .totalTestCases(judgeResult.getTotalTestCases())
+                                        .errorMessage(judgeResult.getErrorMessage())
+                                        .build();
+                }
+
+                boolean accepted = "ACCEPTED".equals(judgeStatus);
                 SubmissionStatus status = accepted
                                 ? SubmissionStatus.ACCEPTED
-                                : SubmissionStatus.valueOf(judgeResult.getStatus());
+                                : SubmissionStatus.WRONG_ANSWER;
 
                 if (accepted) {
                         updateUserStreak(user);
@@ -150,7 +161,6 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 .status(status)
                                 .passedTestCases(judgeResult.getPassedTestCases())
                                 .totalTestCases(judgeResult.getTotalTestCases())
-                                .errorMessage(judgeResult.getErrorMessage())
                                 .testCases(judgeResult.getTestCases())
                                 .build();
         }
