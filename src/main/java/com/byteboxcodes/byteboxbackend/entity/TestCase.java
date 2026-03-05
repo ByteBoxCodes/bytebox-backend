@@ -39,6 +39,9 @@ public class TestCase {
     @Column(columnDefinition = "TEXT")
     private String expectedOutput;
 
+    @Column(columnDefinition = "TEXT")
+    private String explanation;
+
     private Boolean isSample;
 
 }

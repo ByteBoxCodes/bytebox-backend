@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
+import com.byteboxcodes.byteboxbackend.dto.GoogleAuthRequst;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.dto.VerifyRequest;
@@ -59,6 +60,16 @@ public class UserController {
                 .success(true)
                 .message("Email verified successfully")
                 .data("Email verified successfully")
+                .build();
+    }
+
+    @PostMapping("/google")
+    public ApiResponse<String> googleAuth(@RequestBody GoogleAuthRequst googleAuthRequst) {
+        String token = userService.loginWithGoogle(googleAuthRequst.getIdToken());
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Google auth successful")
+                .data(token)
                 .build();
     }
 

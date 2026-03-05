@@ -8,5 +8,6 @@ import lombok.Data;
 public class TestCaseResponse {
     private String input;
     private String expectedOutput;
+    private String explanation;
     private Boolean isSample;
 }

@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +43,7 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(nullable = false)
@@ -84,6 +86,10 @@ public class User {
 
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "preferred_language")
+    private ProgrammingLanguage preferredLanguage;
 
     private LocalDateTime createdAt;
 

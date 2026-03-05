@@ -92,6 +92,8 @@ public class ProblemServiceImpl implements ProblemService {
                                 .map(tc -> TestCaseResponse.builder()
                                                 .input(tc.getInput())
                                                 .expectedOutput(tc.getExpectedOutput())
+                                                .explanation(tc.getExplanation())
+                                                .isSample(tc.getIsSample())
                                                 .build())
                                 .toList();
 

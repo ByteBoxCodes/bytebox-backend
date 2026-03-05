@@ -1,8 +1,10 @@
 package com.byteboxcodes.byteboxbackend.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,10 @@ import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.security.JwtUtil;
 import com.byteboxcodes.byteboxbackend.service.EmailService;
 import com.byteboxcodes.byteboxbackend.service.UserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +38,9 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final EmailRespository emailVerificationRepository;
     private final EmailService emailService;
+
+    @Value("${google.client.id}")
+    private String googleClientId;
 
     @Override
     @Transactional
@@ -72,6 +81,10 @@ public class UserServiceImpl implements UserService {
     public String login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid Credentials"));
+
+        if (user.getPassword() == null) {
+            throw new RuntimeException("This account uses Google Sign-In. Please login with Google.");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid Credentials");
@@ -147,6 +160,76 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         emailVerificationRepository.delete(verificationToken);
+    }
+
+    @Override
+    @Transactional
+    public String loginWithGoogle(String idTokenString) {
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                new NetHttpTransport(),
+                GsonFactory.getDefaultInstance())
+                .setAudience(Collections.singletonList(googleClientId))
+                .build();
+
+        GoogleIdToken idToken;
+        try {
+            idToken = verifier.verify(idTokenString);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to verify Google token: " + e.getMessage());
+        }
+
+        if (idToken == null) {
+            throw new RuntimeException("Invalid Google token");
+        }
+
+        GoogleIdToken.Payload payload = idToken.getPayload();
+
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String picture = (String) payload.get("picture");
+
+        User user = userRepository.findByEmail(email)
+                .map(existingUser -> {
+                    // Sync name & avatar from Google on every login
+                    if (name != null)
+                        existingUser.setName(name);
+                    if (picture != null)
+                        existingUser.setAvatarUrl(picture);
+                    return userRepository.save(existingUser);
+                })
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(email)
+                            .username(generateUsername(email))
+                            .name(name != null ? name : "User")
+                            .avatarUrl(picture)
+                            .role("USER")
+                            .emailVerified(true)
+                            .enabled(true)
+                            .createdAt(LocalDateTime.now())
+                            .build();
+
+                    return userRepository.save(newUser);
+                });
+
+        return jwtUtil.generateToken(user.getEmail());
+    }
+
+    /**
+     * Generates a unique username from the email prefix.
+     * e.g. "mohit@gmail.com" → "mohit", or "mohit1" if "mohit" is taken.
+     */
+    private String generateUsername(String email) {
+        String base = email.split("@")[0]
+                .replaceAll("[^a-zA-Z0-9_]", ""); // strip special chars
+        String username = base;
+        int suffix = 1;
+        while (userRepository.findByUsername(username).isPresent()) {
+            username = base + suffix;
+            suffix++;
+        }
+        return username;
     }
 
 }

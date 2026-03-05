@@ -17,4 +17,6 @@ public interface UserService {
 
     void verifyEmail(String token);
 
+    String loginWithGoogle(String idTokenString);
+
 }
