@@ -1,5 +1,6 @@
 package com.byteboxcodes.byteboxbackend.service.impl;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import com.byteboxcodes.byteboxbackend.dto.Judge0Request;
 import com.byteboxcodes.byteboxbackend.dto.Judge0Response;
 import com.byteboxcodes.byteboxbackend.dto.JudgeResult;
+import com.byteboxcodes.byteboxbackend.dto.TestCaseResult;
 import com.byteboxcodes.byteboxbackend.entity.TestCase;
 import com.byteboxcodes.byteboxbackend.repository.TestCaseRepository;
 import com.byteboxcodes.byteboxbackend.service.JudgeService;
@@ -31,6 +33,8 @@ public class JudgeServiceImpl implements JudgeService {
 
     @Value("${JUDGE0_API_KEY}")
     private String rapidApiKey;
+
+    private static final String JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true";
 
     private String encode(String val) {
         return Base64.getEncoder().encodeToString(val.getBytes());
@@ -55,35 +59,34 @@ public class JudgeServiceImpl implements JudgeService {
     public JudgeResult judge(UUID problemId, String code, String language) {
 
         List<TestCase> testCases = testCaseRepository.findByProblemId(problemId);
-
-        int passed = 0;
         int total = testCases.size();
+        int passed = 0;
 
-        final String url = "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true";
+        List<TestCaseResult> results = new ArrayList<>(total);
+        boolean hasFailure = false;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-RapidAPI-Key", rapidApiKey);
+        headers.set("X-RapidAPI-Host", "judge0-ce.p.rapidapi.com");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String encodedCode = encode(code);
+        int languageId = getLanguageId(language);
 
         for (TestCase testCase : testCases) {
 
             Judge0Request requestBody = Judge0Request.builder()
-                    .language_id(getLanguageId(language))
-                    .source_code(encode(code))
+                    .language_id(languageId)
+                    .source_code(encodedCode)
                     .stdin(encode(testCase.getInput()))
                     .expected_output(encode(testCase.getExpectedOutput()))
                     .build();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-RapidAPI-Key", rapidApiKey);
-            headers.set("X-RapidAPI-Host", "judge0-ce.p.rapidapi.com");
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
             HttpEntity<Judge0Request> entity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<Judge0Response> response;
-
             try {
-                response = restTemplate.postForEntity(
-                        url,
-                        entity,
-                        Judge0Response.class);
+                response = restTemplate.postForEntity(JUDGE0_URL, entity, Judge0Response.class);
             } catch (HttpClientErrorException e) {
                 return JudgeResult.runtimeError(
                         "Judge0 API Error: " + e.getResponseBodyAsString(), total, passed);
@@ -95,24 +98,38 @@ public class JudgeServiceImpl implements JudgeService {
                 return JudgeResult.runtimeError("No response from Judge0", total, passed);
             }
 
+            // Compile error — return immediately (no point running more tests)
             if (body.getCompile_output() != null) {
-                return JudgeResult.compileError(
-                        decode(body.getCompile_output()), total, passed);
+                return JudgeResult.compileError(decode(body.getCompile_output()), total, passed);
             }
 
+            // Runtime error — return immediately
             if (body.getStderr() != null) {
-                return JudgeResult.runtimeError(
-                        decode(body.getStderr()), total, passed);
+                return JudgeResult.runtimeError(decode(body.getStderr()), total, passed);
             }
 
-            if (!"Accepted".equalsIgnoreCase(
-                    body.getStatus().getDescription())) {
-                return JudgeResult.wrongAnswer(total, passed);
+            // Build per-test-case result
+            String userOutput = decode(body.getStdout());
+            String expectedOutput = testCase.getExpectedOutput();
+            boolean accepted = "Accepted".equalsIgnoreCase(
+                    body.getStatus().getDescription());
+
+            if (accepted) {
+                passed++;
+            } else {
+                hasFailure = true;
             }
 
-            passed++;
+            results.add(TestCaseResult.builder()
+                    .input(testCase.getInput())
+                    .expectedOutput(expectedOutput)
+                    .userOutput(userOutput != null ? userOutput.trim() : null)
+                    .status(accepted ? "PASSED" : "WRONG_ANSWER")
+                    .build());
         }
 
-        return JudgeResult.success(total, passed);
+        return hasFailure
+                ? JudgeResult.wrongAnswer(total, passed, results)
+                : JudgeResult.success(total, passed, results);
     }
 }

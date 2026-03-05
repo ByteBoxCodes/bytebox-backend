@@ -54,6 +54,10 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExists("Username already exists");
         }
 
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new UserAlreadyExists("Password is required");
+        }
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())

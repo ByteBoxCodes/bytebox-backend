@@ -72,5 +72,4 @@ public class UserController {
                 .data(token)
                 .build();
     }
-
 }

@@ -3,5 +3,6 @@ package com.byteboxcodes.byteboxbackend.entity;
 public enum SubmissionStatus {
     ACCEPTED,
     WRONG_ANSWER,
-    RUNTIME_ERROR
+    RUNTIME_ERROR,
+    COMPILE_ERROR
 }

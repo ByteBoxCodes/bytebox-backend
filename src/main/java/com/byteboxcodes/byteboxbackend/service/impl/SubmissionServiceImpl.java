@@ -120,11 +120,13 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 request.getCode(),
                                 request.getLanguage());
 
-                SubmissionStatus status = judgeResult.isAccepted()
-                                ? SubmissionStatus.ACCEPTED
-                                : SubmissionStatus.WRONG_ANSWER;
+                boolean accepted = "ACCEPTED".equals(judgeResult.getStatus());
 
-                if (judgeResult.isAccepted()) {
+                SubmissionStatus status = accepted
+                                ? SubmissionStatus.ACCEPTED
+                                : SubmissionStatus.valueOf(judgeResult.getStatus());
+
+                if (accepted) {
                         updateUserStreak(user);
                 }
 
@@ -146,10 +148,10 @@ public class SubmissionServiceImpl implements SubmissionService {
                 return SubmissionResponse.builder()
                                 .submissionId(submission.getId())
                                 .status(status)
-                                .totalTestCases(judgeResult.getTotalTestCases())
                                 .passedTestCases(judgeResult.getPassedTestCases())
-                                .errorType(judgeResult.getErrorType())
+                                .totalTestCases(judgeResult.getTotalTestCases())
                                 .errorMessage(judgeResult.getErrorMessage())
+                                .testCases(judgeResult.getTestCases())
                                 .build();
         }
 
