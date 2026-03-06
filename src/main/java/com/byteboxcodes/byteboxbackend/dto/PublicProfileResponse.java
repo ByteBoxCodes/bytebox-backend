@@ -1,5 +1,7 @@
 package com.byteboxcodes.byteboxbackend.dto;
 
+import com.byteboxcodes.byteboxbackend.entity.ProgrammingLanguage;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +17,7 @@ public class PublicProfileResponse {
     private String name;
     private String bio;
     private String avatarUrl;
+    private ProgrammingLanguage preferredLanguage;
 
     private String githubUsername;
     private String linkedinUsername;
@@ -22,4 +25,5 @@ public class PublicProfileResponse {
     private String websiteUrl;
     private String instagramUsername;
     private String createdAt;
+
 }

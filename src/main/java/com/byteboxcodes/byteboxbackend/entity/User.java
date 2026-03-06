@@ -87,9 +87,10 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "preferred_language")
-    private ProgrammingLanguage preferredLanguage;
+    private ProgrammingLanguage preferredLanguage = ProgrammingLanguage.CPP;
 
     private LocalDateTime createdAt;
 

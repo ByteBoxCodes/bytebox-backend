@@ -51,6 +51,7 @@ public class JudgeServiceImpl implements JudgeService {
             case "JAVA" -> 62;
             case "PYTHON" -> 71;
             case "C++" -> 54;
+            case "C" -> 50;
             default -> throw new RuntimeException("Unsupported language");
         };
     }

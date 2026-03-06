@@ -4,6 +4,7 @@ import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
+import com.byteboxcodes.byteboxbackend.entity.ProgrammingLanguage;
 
 public interface UserService {
 
@@ -18,5 +19,7 @@ public interface UserService {
     void verifyEmail(String token);
 
     String loginWithGoogle(String idTokenString);
+
+    void updatePreferredLanguage(ProgrammingLanguage language);
 
 }

@@ -1,16 +1,15 @@
 package com.byteboxcodes.byteboxbackend.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.GoogleAuthRequst;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
+import com.byteboxcodes.byteboxbackend.dto.PreferredLanguageRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.dto.VerifyRequest;
 import com.byteboxcodes.byteboxbackend.service.UserService;
@@ -70,6 +69,19 @@ public class UserController {
                 .success(true)
                 .message("Google auth successful")
                 .data(token)
+                .build();
+    }
+
+    @PutMapping("/preferred-language")
+    public ApiResponse<String> updatePreferredLanguage(
+            @RequestBody PreferredLanguageRequest request) {
+
+        userService.updatePreferredLanguage(request.getPreferredLanguage());
+
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Preferred language updated")
+                .data("Updated successfully")
                 .build();
     }
 }

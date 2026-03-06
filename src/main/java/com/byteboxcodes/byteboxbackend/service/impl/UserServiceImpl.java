@@ -14,6 +14,7 @@ import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.entity.EmailVerification;
+import com.byteboxcodes.byteboxbackend.entity.ProgrammingLanguage;
 import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.exception.UserAlreadyExists;
 import com.byteboxcodes.byteboxbackend.repository.EmailRespository;
@@ -111,6 +112,7 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .bio(user.getBio())
                 .avatarUrl(user.getAvatarUrl())
+                .preferredLanguage(user.getPreferredLanguage())
                 .githubUsername(user.getGithubUsername())
                 .linkedinUsername(user.getLinkedinUsername())
                 .twitterUsername(user.getTwitterUsername())
@@ -236,4 +238,19 @@ public class UserServiceImpl implements UserService {
         return username;
     }
 
+    @Override
+    public void updatePreferredLanguage(ProgrammingLanguage language) {
+
+        String email = (String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPreferredLanguage(language);
+
+        userRepository.save(user);
+    }
 }
