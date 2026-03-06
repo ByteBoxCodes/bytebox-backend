@@ -55,7 +55,10 @@ public class SubmissionServiceImpl implements SubmissionService {
                 }
 
                 if (!matched) {
-                        throw new RuntimeException("Write code according to problem statement use instructions");
+                        throw new RuntimeException(
+                                        "Write code according to problem statement,  Make sure you code contains ("
+                                                        + requiredKeywords.toUpperCase() +
+                                                        "), Check your code using required keywords, Check instructions & constraints properly");
                 }
 
         }
@@ -114,6 +117,8 @@ public class SubmissionServiceImpl implements SubmissionService {
                 // 2️⃣ Fetch problem
                 Problem problem = problemRespository.findById(request.getProblemId())
                                 .orElseThrow(() -> new RuntimeException("Problem not found"));
+
+                validateKeywords(problem, request.getCode());
 
                 JudgeResult judgeResult = judgeService.judge(
                                 problem.getId(),

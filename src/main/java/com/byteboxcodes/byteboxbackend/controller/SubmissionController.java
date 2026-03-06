@@ -3,6 +3,7 @@ package com.byteboxcodes.byteboxbackend.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.byteboxcodes.byteboxbackend.dto.JudgeResult;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionListResponse;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionRequest;
 import com.byteboxcodes.byteboxbackend.dto.SubmissionResponse;
@@ -25,10 +26,10 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    // @PostMapping("/run")
-    // public JudgeResult run(@RequestBody SubmissionRequest request) {
-    // return submissionService.runCode(request);
-    // }
+    @PostMapping("/run")
+    public JudgeResult run(@RequestBody SubmissionRequest request) {
+        return submissionService.runCode(request);
+    }
 
     @PostMapping("/submit")
     public SubmissionResponse submit(@RequestBody SubmissionRequest request) {

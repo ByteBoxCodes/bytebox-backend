@@ -115,6 +115,10 @@ public class JudgeServiceImpl implements JudgeService {
             boolean accepted = "Accepted".equalsIgnoreCase(
                     body.getStatus().getDescription());
 
+            if (!accepted && userOutput != null && expectedOutput != null) {
+                accepted = userOutput.trim().toLowerCase().equals(expectedOutput.trim().toLowerCase());
+            }
+
             if (accepted) {
                 passed++;
             } else {
@@ -191,6 +195,10 @@ public class JudgeServiceImpl implements JudgeService {
             String output = decode(body.getStdout());
             String expectedOutput = testCase.getExpectedOutput();
             boolean success = "Accepted".equalsIgnoreCase(body.getStatus().getDescription());
+
+            if (!success && output != null && expectedOutput != null) {
+                success = output.trim().toLowerCase().equals(expectedOutput.trim().toLowerCase());
+            }
 
             if (success) {
                 passed++;
