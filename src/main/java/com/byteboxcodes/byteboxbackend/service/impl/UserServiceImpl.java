@@ -13,6 +13,7 @@ import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
+import com.byteboxcodes.byteboxbackend.entity.TokenTypeEnum;
 import com.byteboxcodes.byteboxbackend.entity.EmailVerification;
 import com.byteboxcodes.byteboxbackend.entity.ProgrammingLanguage;
 import com.byteboxcodes.byteboxbackend.entity.User;
@@ -74,6 +75,7 @@ public class UserServiceImpl implements UserService {
         EmailVerification emailVerificationToken = EmailVerification.builder()
                 .token(token)
                 .user(user)
+                .tokenType(TokenTypeEnum.EMAIL_VERIFICATION)
                 .expiryDate(LocalDateTime.now().plusHours(1))
                 .build();
         emailVerificationRepository.save(emailVerificationToken);
@@ -136,6 +138,12 @@ public class UserServiceImpl implements UserService {
             user.setName(request.getName());
         if (request.getAvatarUrl() != null)
             user.setAvatarUrl(request.getAvatarUrl());
+        if (request.getUsername() != null) {
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                throw new RuntimeException("Username already exists");
+            }
+            user.setUsername(request.getUsername());
+        }
         if (request.getGithubUsername() != null)
             user.setGithubUsername(request.getGithubUsername());
         if (request.getLinkedinUsername() != null)
@@ -155,6 +163,11 @@ public class UserServiceImpl implements UserService {
     public void verifyEmail(String token) {
         EmailVerification verificationToken = emailVerificationRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (verificationToken.getTokenType() != null
+                && verificationToken.getTokenType() != TokenTypeEnum.EMAIL_VERIFICATION) {
+            throw new RuntimeException("Invalid token type");
+        }
 
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");
@@ -252,5 +265,49 @@ public class UserServiceImpl implements UserService {
         user.setPreferredLanguage(language);
 
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getPassword() == null) {
+            throw new RuntimeException("This account uses Google Sign-In. You cannot reset password.");
+        }
+
+        String token = UUID.randomUUID().toString();
+
+        EmailVerification passwordResetToken = EmailVerification.builder()
+                .token(token)
+                .user(user)
+                .tokenType(TokenTypeEnum.PASSWORD_RESET)
+                .expiryDate(LocalDateTime.now().plusHours(1))
+                .build();
+        emailVerificationRepository.save(passwordResetToken);
+
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        EmailVerification resetToken = emailVerificationRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (resetToken.getTokenType() != TokenTypeEnum.PASSWORD_RESET) {
+            throw new RuntimeException("Invalid token type");
+        }
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        emailVerificationRepository.delete(resetToken);
     }
 }

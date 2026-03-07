@@ -41,4 +41,9 @@ public class ProblemController {
         return problemService.getProblemById(id);
     }
 
+    @GetMapping("/search")
+    public List<ProblemListResponse> searchProblems(@RequestParam String query) {
+        return problemService.searchProblems(query);
+    }
+
 }

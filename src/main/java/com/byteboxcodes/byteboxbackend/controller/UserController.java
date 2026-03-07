@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
+import com.byteboxcodes.byteboxbackend.dto.ForgotPasswordRequest;
 import com.byteboxcodes.byteboxbackend.dto.GoogleAuthRequst;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.PreferredLanguageRequest;
+import com.byteboxcodes.byteboxbackend.dto.ResetPasswordRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
 import com.byteboxcodes.byteboxbackend.dto.VerifyRequest;
 import com.byteboxcodes.byteboxbackend.service.UserService;
@@ -82,6 +84,26 @@ public class UserController {
                 .success(true)
                 .message("Preferred language updated")
                 .data("Updated successfully")
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        userService.forgotPassword(request.getEmail());
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Password reset email sent")
+                .data("Password reset email sent if associated with an account")
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    public ApiResponse<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request.getToken(), request.getNewPassword());
+        return ApiResponse.<String>builder()
+                .success(true)
+                .message("Password updated successfully")
+                .data("Password updated successfully")
                 .build();
     }
 }

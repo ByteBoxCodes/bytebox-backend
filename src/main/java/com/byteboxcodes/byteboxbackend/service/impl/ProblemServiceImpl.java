@@ -148,4 +148,19 @@ public class ProblemServiceImpl implements ProblemService {
                                                 .build())
                                 .toList();
         }
+
+        @Override
+        public List<ProblemListResponse> searchProblems(String query) {
+                Set<UUID> solvedSet = getSolvedProblemIds();
+
+                return problemRespository.searchProblems(query).stream()
+                                .map(problem -> ProblemListResponse.builder()
+                                                .id(problem.getId())
+                                                .title(problem.getTitle())
+                                                .difficulty(problem.getDifficulty().name())
+                                                .orderIndex(problem.getOrderIndex())
+                                                .isSolved(solvedSet.contains(problem.getId()))
+                                                .build())
+                                .toList();
+        }
 }

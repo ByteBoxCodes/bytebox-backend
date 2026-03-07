@@ -16,4 +16,6 @@ public interface ProblemService {
     List<ProblemListResponse> getProblemsByDifficulty(Difficulty difficulty);
 
     List<ProblemListResponse> getProblemsByTopic(String topic);
+
+    List<ProblemListResponse> searchProblems(String query);
 }

@@ -10,6 +10,8 @@ public class ProfileUpdateRequest {
 
     private String name;
 
+    private String username;
+
     @JsonAlias({ "avatar", "avatarUrl" })
     private String avatarUrl;
 

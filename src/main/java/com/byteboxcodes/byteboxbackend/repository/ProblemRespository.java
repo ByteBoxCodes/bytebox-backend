@@ -11,29 +11,38 @@ import com.byteboxcodes.byteboxbackend.entity.Problem;
 import com.byteboxcodes.byteboxbackend.entity.Topic;
 
 public interface ProblemRespository extends JpaRepository<Problem, UUID> {
-    List<Problem> findByDifficulty(Difficulty difficulty);
+        List<Problem> findByDifficulty(Difficulty difficulty);
 
-    List<Problem> findByTopic(Topic topic);
+        List<Problem> findByTopic(Topic topic);
 
-    long countByIsActiveTrue();
+        long countByIsActiveTrue();
 
-    long countByDifficultyAndIsActiveTrue(Difficulty difficulty);
+        long countByDifficultyAndIsActiveTrue(Difficulty difficulty);
 
-    @Query("""
-            SELECT p.difficulty, COUNT(p)
-            FROM Problem p
-            WHERE p.isActive = true
-            GROUP BY p.difficulty
-            """)
-    List<Object[]> countActiveProblemsGroupedByDifficulty();
+        @Query("""
+                        SELECT p.difficulty, COUNT(p)
+                        FROM Problem p
+                        WHERE p.isActive = true
+                        GROUP BY p.difficulty
+                        """)
+        List<Object[]> countActiveProblemsGroupedByDifficulty();
 
-    @Query("""
-            SELECT p.topic.id, COUNT(p)
-            FROM Problem p
-            WHERE p.isActive = true
-            GROUP BY p.topic.id
-            """)
-    List<Object[]> countActiveProblemsGroupedByTopic();
+        @Query("""
+                        SELECT p.topic.id, COUNT(p)
+                        FROM Problem p
+                        WHERE p.isActive = true
+                        GROUP BY p.topic.id
+                        """)
+        List<Object[]> countActiveProblemsGroupedByTopic();
 
-    List<Problem> findByIsActiveTrueOrderByOrderIndexAsc();
+        List<Problem> findByIsActiveTrueOrderByOrderIndexAsc();
+
+        @Query("""
+                        SELECT p
+                        FROM Problem p
+                        WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))
+                        AND p.isActive = true
+                        ORDER BY p.orderIndex ASC
+                        """)
+        List<Problem> searchProblems(String query);
 }

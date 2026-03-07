@@ -32,4 +32,20 @@ public class EmailServiceImpl implements EmailService {
 
         mailSender.send(message);
     }
+
+    @Override
+    public void sendPasswordResetEmail(String email, String token) {
+
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Reset Your Password - ByteBoxCodes");
+        message.setText(
+                "Click the link below to reset your password:\n\n"
+                        + resetLink +
+                        "\n\nThis link expires in 1 hour if not used.");
+
+        mailSender.send(message);
+    }
 }

@@ -22,4 +22,8 @@ public interface UserService {
 
     void updatePreferredLanguage(ProgrammingLanguage language);
 
+    void forgotPassword(String email);
+
+    void resetPassword(String token, String newPassword);
+
 }
