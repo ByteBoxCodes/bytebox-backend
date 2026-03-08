@@ -18,6 +18,8 @@ public class PublicProfileResponse {
     private String bio;
     private String avatarUrl;
     private ProgrammingLanguage preferredLanguage;
+    private Integer points;
+    private Long totalProblemsolved;
 
     private String githubUsername;
     private String linkedinUsername;

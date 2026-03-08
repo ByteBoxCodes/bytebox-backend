@@ -71,6 +71,10 @@ public class User {
     private String instagramUsername;
 
     @Builder.Default
+    @Column(name = "points", columnDefinition = "integer default 0")
+    private Integer points = 0;
+
+    @Builder.Default
     @Column(name = "current_streak")
     private Integer currentStreak = 0;
 

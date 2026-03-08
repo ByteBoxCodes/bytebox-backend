@@ -2,6 +2,7 @@ package com.byteboxcodes.byteboxbackend.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.byteboxcodes.byteboxbackend.dto.LeaderboardResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
@@ -19,6 +21,7 @@ import com.byteboxcodes.byteboxbackend.entity.ProgrammingLanguage;
 import com.byteboxcodes.byteboxbackend.entity.User;
 import com.byteboxcodes.byteboxbackend.exception.UserAlreadyExists;
 import com.byteboxcodes.byteboxbackend.repository.EmailRespository;
+import com.byteboxcodes.byteboxbackend.repository.SubmissionRepository;
 import com.byteboxcodes.byteboxbackend.repository.UserRepository;
 import com.byteboxcodes.byteboxbackend.security.JwtUtil;
 import com.byteboxcodes.byteboxbackend.service.EmailService;
@@ -40,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final EmailRespository emailVerificationRepository;
     private final EmailService emailService;
+    private final SubmissionRepository submissionRepository;
 
     @Value("${google.client.id}")
     private String googleClientId;
@@ -115,6 +119,8 @@ public class UserServiceImpl implements UserService {
                 .bio(user.getBio())
                 .avatarUrl(user.getAvatarUrl())
                 .preferredLanguage(user.getPreferredLanguage())
+                .points(user.getPoints())
+                .totalProblemsolved(submissionRepository.countSolvedProblems(user.getId()))
                 .githubUsername(user.getGithubUsername())
                 .linkedinUsername(user.getLinkedinUsername())
                 .twitterUsername(user.getTwitterUsername())
@@ -309,5 +315,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         emailVerificationRepository.delete(resetToken);
+    }
+
+    @Override
+    public List<LeaderboardResponse> getLeaderboard() {
+        return userRepository.getLeaderboard();
     }
 }

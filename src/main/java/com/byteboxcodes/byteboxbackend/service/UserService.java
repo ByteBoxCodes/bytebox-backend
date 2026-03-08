@@ -1,5 +1,8 @@
 package com.byteboxcodes.byteboxbackend.service;
 
+import java.util.List;
+
+import com.byteboxcodes.byteboxbackend.dto.LeaderboardResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
 import com.byteboxcodes.byteboxbackend.dto.PublicProfileResponse;
@@ -26,4 +29,5 @@ public interface UserService {
 
     void resetPassword(String token, String newPassword);
 
+    List<LeaderboardResponse> getLeaderboard();
 }

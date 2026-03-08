@@ -1,5 +1,8 @@
 package com.byteboxcodes.byteboxbackend.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.ForgotPasswordRequest;
 import com.byteboxcodes.byteboxbackend.dto.GoogleAuthRequst;
+import com.byteboxcodes.byteboxbackend.dto.LeaderboardResponse;
 import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.PreferredLanguageRequest;
 import com.byteboxcodes.byteboxbackend.dto.ResetPasswordRequest;
@@ -71,6 +75,15 @@ public class UserController {
                 .success(true)
                 .message("Google auth successful")
                 .data(token)
+                .build();
+    }
+
+    @GetMapping("/leaderboard")
+    public ApiResponse<List<LeaderboardResponse>> getLeaderboard() {
+        return ApiResponse.<List<LeaderboardResponse>>builder()
+                .success(true)
+                .message("Leaderboard fetched successfully")
+                .data(userService.getLeaderboard())
                 .build();
     }
 

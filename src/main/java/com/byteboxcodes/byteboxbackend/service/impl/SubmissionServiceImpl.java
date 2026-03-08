@@ -142,10 +142,6 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 ? SubmissionStatus.ACCEPTED
                                 : SubmissionStatus.WRONG_ANSWER;
 
-                if (accepted) {
-                        updateUserStreak(user);
-                }
-
                 // 4️⃣ Create submission entity
                 Submission submission = Submission.builder()
                                 .user(user)
@@ -160,6 +156,39 @@ public class SubmissionServiceImpl implements SubmissionService {
 
                 // 5️⃣ Save and return
                 submissionRepository.save(submission);
+
+                if (accepted) {
+                        updateUserStreak(user);
+
+                        // Award points if this is the user's first time solving this problem
+                        // The user solved it just now, but if the count of accepted submissions for
+                        // this problem is exactly 1 (the one we just saved)
+
+                        long acceptedCount = submissionRepository
+                                        .findByUserIdAndProblemId(user.getId(), problem.getId())
+                                        .stream()
+                                        .filter(s -> s.getStatus() == SubmissionStatus.ACCEPTED)
+                                        .count();
+
+                        if (acceptedCount == 1) {
+                                int pointsToAward = 0;
+                                switch (problem.getDifficulty()) {
+                                        case EASY:
+                                                pointsToAward = 5;
+                                                break;
+                                        case MEDIUM:
+                                                pointsToAward = 7;
+                                                break;
+                                        case HARD:
+                                                pointsToAward = 10;
+                                                break;
+                                }
+                                user.setPoints((user.getPoints() == null ? 0 : user.getPoints()) + pointsToAward);
+                                userRepository.save(user); // Save updated streak and points
+                        } else {
+                                userRepository.save(user); // Save updated streak
+                        }
+                }
 
                 return SubmissionResponse.builder()
                                 .submissionId(submission.getId())
