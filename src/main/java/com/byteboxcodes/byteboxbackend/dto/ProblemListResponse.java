@@ -1,7 +1,6 @@
 package com.byteboxcodes.byteboxbackend.dto;
 
 import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Data;
 

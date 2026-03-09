@@ -17,5 +17,7 @@ public interface ProblemService {
 
     List<ProblemListResponse> getProblemsByTopic(String topic);
 
+    List<ProblemListResponse> getProblemsByTopicId(Long topicId);
+
     List<ProblemListResponse> searchProblems(String query);
 }

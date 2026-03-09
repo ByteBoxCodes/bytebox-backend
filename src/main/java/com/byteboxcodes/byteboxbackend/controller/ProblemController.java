@@ -41,6 +41,11 @@ public class ProblemController {
         return problemService.getProblemById(id);
     }
 
+    @GetMapping("/topic/{topicId}")
+    public List<ProblemListResponse> getProblemsByTopicId(@PathVariable Long topicId) {
+        return problemService.getProblemsByTopicId(topicId);
+    }
+
     @GetMapping("/search")
     public List<ProblemListResponse> searchProblems(@RequestParam String query) {
         return problemService.searchProblems(query);
