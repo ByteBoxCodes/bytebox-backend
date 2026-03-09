@@ -121,7 +121,7 @@ public class ProblemServiceImpl implements ProblemService {
         public List<ProblemListResponse> getProblemsByDifficulty(Difficulty difficulty) {
                 Set<UUID> solvedSet = getSolvedProblemIds();
 
-                return problemRespository.findByDifficulty(difficulty).stream()
+                return problemRespository.findByDifficultyAndIsActiveTrueOrderByOrderIndexAsc(difficulty).stream()
                                 .map(problem -> ProblemListResponse.builder()
                                                 .id(problem.getId())
                                                 .title(problem.getTitle())
@@ -138,7 +138,7 @@ public class ProblemServiceImpl implements ProblemService {
 
                 Topic topic = topicRespository.findByName(topicName).orElseThrow(
                                 () -> new RuntimeException("Topic not found"));
-                return problemRespository.findByTopic(topic).stream()
+                return problemRespository.findByTopicAndIsActiveTrueOrderByOrderIndexAsc(topic).stream()
                                 .map(problem -> ProblemListResponse.builder()
                                                 .id(problem.getId())
                                                 .title(problem.getTitle())
@@ -153,7 +153,7 @@ public class ProblemServiceImpl implements ProblemService {
         public List<ProblemListResponse> getProblemsByTopicId(Long topicId) {
                 Set<UUID> solvedSet = getSolvedProblemIds();
 
-                return problemRespository.findByTopicId(topicId).stream()
+                return problemRespository.findByTopicIdAndIsActiveTrueOrderByOrderIndexAsc(topicId).stream()
                                 .map(problem -> ProblemListResponse.builder()
                                                 .id(problem.getId())
                                                 .title(problem.getTitle())

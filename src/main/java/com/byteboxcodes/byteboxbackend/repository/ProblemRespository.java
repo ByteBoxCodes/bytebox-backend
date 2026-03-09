@@ -11,11 +11,11 @@ import com.byteboxcodes.byteboxbackend.entity.Problem;
 import com.byteboxcodes.byteboxbackend.entity.Topic;
 
 public interface ProblemRespository extends JpaRepository<Problem, UUID> {
-        List<Problem> findByDifficulty(Difficulty difficulty);
+        List<Problem> findByDifficultyAndIsActiveTrueOrderByOrderIndexAsc(Difficulty difficulty);
 
-        List<Problem> findByTopic(Topic topic);
+        List<Problem> findByTopicAndIsActiveTrueOrderByOrderIndexAsc(Topic topic);
 
-        List<Problem> findByTopicId(Long topicId);
+        List<Problem> findByTopicIdAndIsActiveTrueOrderByOrderIndexAsc(Long topicId);
 
         long countByIsActiveTrue();
 
