@@ -14,5 +14,6 @@ public class LeaderboardResponse {
     private String name;
     private String avatarUrl;
     private Integer points;
+    private Integer level;
     private Long totalProblemsolved;
 }

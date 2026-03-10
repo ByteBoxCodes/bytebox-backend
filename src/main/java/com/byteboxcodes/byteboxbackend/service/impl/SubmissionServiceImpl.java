@@ -174,29 +174,46 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 int pointsToAward = 0;
                                 switch (problem.getDifficulty()) {
                                         case EASY:
-                                                pointsToAward = 5;
+                                                pointsToAward = 10;
                                                 break;
                                         case MEDIUM:
-                                                pointsToAward = 7;
+                                                pointsToAward = 15;
                                                 break;
                                         case HARD:
-                                                pointsToAward = 10;
+                                                pointsToAward = 20;
                                                 break;
                                 }
                                 user.setPoints((user.getPoints() == null ? 0 : user.getPoints()) + pointsToAward);
+
+                                // Check for topic completion bonus
+                                if (problem.getTopic() != null) {
+                                        long topicId = problem.getTopic().getId();
+                                        long totalActiveProblemsInTopic = problemRespository
+                                                        .countByTopicIdAndIsActiveTrue(topicId);
+                                        long solvedProblemsInTopic = submissionRepository
+                                                        .countSolvedProblemsByTopicId(user.getId(), topicId);
+
+                                        if (totalActiveProblemsInTopic > 0
+                                                        && solvedProblemsInTopic == totalActiveProblemsInTopic) {
+                                                user.setPoints(user.getPoints() + 50);
+                                        }
+                                }
+
+                                // Update Level: Every 15 points = 1 level
+                                int newLevel = (user.getPoints() / 15) + 1;
+                                user.setLevel(newLevel);
+
                                 userRepository.save(user); // Save updated streak and points
                         } else {
                                 userRepository.save(user); // Save updated streak
                         }
                 }
 
-                return SubmissionResponse.builder()
-                                .submissionId(submission.getId())
-                                .status(status)
+                return SubmissionResponse.builder().submissionId(submission.getId()).status(status)
                                 .passedTestCases(judgeResult.getPassedTestCases())
-                                .totalTestCases(judgeResult.getTotalTestCases())
-                                .testCases(judgeResult.getTestCases())
+                                .totalTestCases(judgeResult.getTotalTestCases()).testCases(judgeResult.getTestCases())
                                 .build();
+
         }
 
         // 🔥 Get submissions of logged-in user

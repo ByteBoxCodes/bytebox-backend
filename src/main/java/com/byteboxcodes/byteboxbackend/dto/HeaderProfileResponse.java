@@ -10,6 +10,8 @@ public class HeaderProfileResponse {
     private String username;
     private String name;
     private String avatarUrl;
+    private Integer points;
+    private Integer level;
     private Integer currentStreak;
     private Integer maxStreak;
 }

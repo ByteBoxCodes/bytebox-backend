@@ -75,6 +75,10 @@ public class User {
     private Integer points = 0;
 
     @Builder.Default
+    @Column(name = "level", columnDefinition = "integer default 1")
+    private Integer level = 1;
+
+    @Builder.Default
     @Column(name = "current_streak")
     private Integer currentStreak = 0;
 

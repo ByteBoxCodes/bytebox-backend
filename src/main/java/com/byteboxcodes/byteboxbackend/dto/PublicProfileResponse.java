@@ -19,6 +19,7 @@ public class PublicProfileResponse {
     private String avatarUrl;
     private ProgrammingLanguage preferredLanguage;
     private Integer points;
+    private Integer level;
     private Long totalProblemsolved;
 
     private String githubUsername;

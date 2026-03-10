@@ -17,6 +17,8 @@ public interface ProblemRespository extends JpaRepository<Problem, UUID> {
 
         List<Problem> findByTopicIdAndIsActiveTrueOrderByOrderIndexAsc(Long topicId);
 
+        long countByTopicIdAndIsActiveTrue(Long topicId);
+
         long countByIsActiveTrue();
 
         long countByDifficultyAndIsActiveTrue(Difficulty difficulty);

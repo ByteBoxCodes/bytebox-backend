@@ -120,6 +120,7 @@ public class UserServiceImpl implements UserService {
                 .avatarUrl(user.getAvatarUrl())
                 .preferredLanguage(user.getPreferredLanguage())
                 .points(user.getPoints())
+                .level(user.getLevel())
                 .totalProblemsolved(submissionRepository.countSolvedProblems(user.getId()))
                 .githubUsername(user.getGithubUsername())
                 .linkedinUsername(user.getLinkedinUsername())
