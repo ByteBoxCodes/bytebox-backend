@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
             user.setName(request.getName());
         if (request.getAvatarUrl() != null)
             user.setAvatarUrl(request.getAvatarUrl());
-        if (request.getUsername() != null) {
+        if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
             if (userRepository.findByUsername(request.getUsername()).isPresent()) {
                 throw new RuntimeException("Username already exists");
             }
