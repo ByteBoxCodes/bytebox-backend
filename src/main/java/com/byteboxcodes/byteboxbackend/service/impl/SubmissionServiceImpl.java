@@ -177,10 +177,10 @@ public class SubmissionServiceImpl implements SubmissionService {
                                                 pointsToAward = 10;
                                                 break;
                                         case MEDIUM:
-                                                pointsToAward = 15;
+                                                pointsToAward = 20;
                                                 break;
                                         case HARD:
-                                                pointsToAward = 20;
+                                                pointsToAward = 30;
                                                 break;
                                 }
                                 user.setPoints((user.getPoints() == null ? 0 : user.getPoints()) + pointsToAward);
@@ -195,7 +195,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
                                         if (totalActiveProblemsInTopic > 0
                                                         && solvedProblemsInTopic == totalActiveProblemsInTopic) {
-                                                user.setPoints(user.getPoints() + 50);
+                                                user.setPoints(user.getPoints() + 100);
                                         }
                                 }
 
