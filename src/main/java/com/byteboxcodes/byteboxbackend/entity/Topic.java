@@ -31,4 +31,8 @@ public class Topic {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    @Builder.Default
+    private boolean isActive = true;
+
 }

@@ -45,7 +45,7 @@ public class TopicServiceImpl implements TopicService {
             user = userRepository.findByEmail(email).orElse(null);
         }
 
-        List<Topic> topics = topicRespository.findAll();
+        List<Topic> topics = topicRespository.findAllByIsActiveTrue();
 
         Map<Long, Long> totalMap = new HashMap<>();
 
