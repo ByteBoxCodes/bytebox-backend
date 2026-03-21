@@ -135,6 +135,7 @@ public class ProfileServiceImpl implements ProfileService {
                                 .avatarUrl(user.getAvatarUrl())
                                 .level(user.getLevel())
                                 .points(user.getPoints())
+                                .levelXp(user.getLevelXp())
                                 .currentStreak(user.getEffectiveCurrentStreak())
                                 .maxStreak(user.getMaxStreak())
                                 .build();

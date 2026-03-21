@@ -184,6 +184,7 @@ public class SubmissionServiceImpl implements SubmissionService {
                                                 break;
                                 }
                                 user.setPoints((user.getPoints() == null ? 0 : user.getPoints()) + pointsToAward);
+                                user.setLevelXp((user.getLevelXp() == null ? 0 : user.getLevelXp()) + pointsToAward);
 
                                 // Check for topic completion bonus
                                 if (problem.getTopic() != null) {
@@ -196,12 +197,20 @@ public class SubmissionServiceImpl implements SubmissionService {
                                         if (totalActiveProblemsInTopic > 0
                                                         && solvedProblemsInTopic == totalActiveProblemsInTopic) {
                                                 user.setPoints(user.getPoints() + 100);
+                                                user.setLevelXp(user.getLevelXp() + 100);
                                         }
                                 }
 
-                                // Update Level: Every 15 points = 1 level
-                                int newLevel = (user.getPoints() / 15) + 1;
-                                user.setLevel(newLevel);
+                                // Update Level: Need 5 more xp per level. Level 1 -> 2 needs 15xp, 2 -> 3 needs 20xp
+                                while (true) {
+                                        int requiredXp = 10 + (user.getLevel() * 5);
+                                        if (user.getLevelXp() >= requiredXp) {
+                                                user.setLevelXp(user.getLevelXp() - requiredXp);
+                                                user.setLevel(user.getLevel() + 1);
+                                        } else {
+                                                break;
+                                        }
+                                }
 
                                 userRepository.save(user); // Save updated streak and points
                         } else {

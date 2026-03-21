@@ -121,6 +121,7 @@ public class UserServiceImpl implements UserService {
                 .preferredLanguage(user.getPreferredLanguage())
                 .points(user.getPoints())
                 .level(user.getLevel())
+                .levelXp(user.getLevelXp())
                 .totalProblemsolved(submissionRepository.countSolvedProblems(user.getId()))
                 .githubUsername(user.getGithubUsername())
                 .linkedinUsername(user.getLinkedinUsername())
@@ -220,8 +221,13 @@ public class UserServiceImpl implements UserService {
                     // Sync name & avatar from Google on every login
                     if (name != null)
                         existingUser.setName(name);
-                    if (picture != null)
-                        existingUser.setAvatarUrl(picture);
+                    if (picture != null) {
+                        String currentAvatar = existingUser.getAvatarUrl();
+                        // Only sync avatar from Google if the user hasn't uploaded one to Cloudinary
+                        if (currentAvatar == null || !currentAvatar.contains("res.cloudinary.com")) {
+                            existingUser.setAvatarUrl(picture);
+                        }
+                    }
                     return userRepository.save(existingUser);
                 })
                 .orElseGet(() -> {
@@ -288,12 +294,12 @@ public class UserServiceImpl implements UserService {
 
         EmailVerification passwordResetToken = emailVerificationRepository.findByUser(user)
                 .orElse(new EmailVerification());
-        
+
         passwordResetToken.setToken(token);
         passwordResetToken.setUser(user);
         passwordResetToken.setTokenType(TokenTypeEnum.PASSWORD_RESET);
         passwordResetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
-        
+
         emailVerificationRepository.save(passwordResetToken);
 
         emailService.sendPasswordResetEmail(user.getEmail(), token);

@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("""
                 SELECT new com.byteboxcodes.byteboxbackend.dto.LeaderboardResponse(
-                    u.username, u.name, u.avatarUrl, u.points, u.level,
+                    u.username, u.name, u.avatarUrl, u.points, u.level, u.levelXp,
                     COALESCE((SELECT COUNT(DISTINCT s.problem.id) FROM com.byteboxcodes.byteboxbackend.entity.Submission s WHERE s.user.id = u.id AND s.status = 'ACCEPTED'), 0)
                 )
                 FROM User u
