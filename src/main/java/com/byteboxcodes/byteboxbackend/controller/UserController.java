@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
@@ -59,8 +60,8 @@ public class UserController {
     }
 
     @PostMapping("/verify")
-    public ApiResponse<String> verifyEmail(@RequestBody VerifyRequest request) {
-        userService.verifyEmail(request.getToken());
+    public ApiResponse<String> verifyEmail(@RequestParam String token) {
+        userService.verifyEmail(token);
         return ApiResponse.<String>builder()
                 .success(true)
                 .message("Email verified successfully")

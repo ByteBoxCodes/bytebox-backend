@@ -286,12 +286,14 @@ public class UserServiceImpl implements UserService {
 
         String token = UUID.randomUUID().toString();
 
-        EmailVerification passwordResetToken = EmailVerification.builder()
-                .token(token)
-                .user(user)
-                .tokenType(TokenTypeEnum.PASSWORD_RESET)
-                .expiryDate(LocalDateTime.now().plusHours(1))
-                .build();
+        EmailVerification passwordResetToken = emailVerificationRepository.findByUser(user)
+                .orElse(new EmailVerification());
+        
+        passwordResetToken.setToken(token);
+        passwordResetToken.setUser(user);
+        passwordResetToken.setTokenType(TokenTypeEnum.PASSWORD_RESET);
+        passwordResetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
+        
         emailVerificationRepository.save(passwordResetToken);
 
         emailService.sendPasswordResetEmail(user.getEmail(), token);
