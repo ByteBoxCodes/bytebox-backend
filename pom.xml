@@ -31,6 +31,27 @@
 	</properties>
 	<dependencies>
 
+
+		<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.11.5</version>
+</dependency>
+
+<!-- REQUIRED -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.11.5</version>
+</dependency>
+
+<!-- REQUIRED -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.11.5</version>
+</dependency>
+
 		<!-- google api client -->
 		<dependency>
 			<groupId>com.google.api-client</groupId>

@@ -7,16 +7,18 @@ public class CppExecutionStrategy extends AbstractDockerExecutionStrategy {
 
     @Override
     protected String getDockerImage() {
+        // Official GCC image (Debian-based) — no Alpine variant exists on Docker Hub
         return "gcc:latest";
     }
 
     @Override
     protected String getExecutionCommand(String base64Code) {
-        return "echo '" + base64Code + "' | base64 -d > main.cpp && g++ main.cpp -o main && ./main";
+        // Decode to /tmp (RAM), compile output also to /tmp, execute from /tmp
+        return "echo '" + base64Code + "' | base64 -d > /tmp/main.cpp && g++ /tmp/main.cpp -o /tmp/main && /tmp/main";
     }
 
     @Override
     public String getLanguageName() {
-        return "C++"; // Or "CPP" depending on how it's sent from frontend
+        return "C++";
     }
 }
