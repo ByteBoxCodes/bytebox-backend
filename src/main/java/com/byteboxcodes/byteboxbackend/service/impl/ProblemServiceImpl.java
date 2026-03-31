@@ -114,7 +114,6 @@ public class ProblemServiceImpl implements ProblemService {
                                 .orderIndex(problem.getOrderIndex())
                                 .isActive(problem.getIsActive())
                                 .build();
-
         }
 
         @Override

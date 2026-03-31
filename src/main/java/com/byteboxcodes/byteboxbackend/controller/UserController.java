@@ -18,7 +18,6 @@ import com.byteboxcodes.byteboxbackend.dto.LoginRequest;
 import com.byteboxcodes.byteboxbackend.dto.PreferredLanguageRequest;
 import com.byteboxcodes.byteboxbackend.dto.ResetPasswordRequest;
 import com.byteboxcodes.byteboxbackend.dto.UserRequest;
-import com.byteboxcodes.byteboxbackend.dto.VerifyRequest;
 import com.byteboxcodes.byteboxbackend.service.UserService;
 
 import lombok.RequiredArgsConstructor;
