@@ -15,6 +15,8 @@ import com.byteboxcodes.byteboxbackend.entity.User;
 public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
         List<Submission> findByUser(User user);
 
+        List<Submission> findTop5ByUser_IdOrderBySubmittedAtDesc(UUID userId);
+
         List<Submission> findByProblem(Problem problem);
 
         List<Submission> findByUserIdAndProblemId(UUID userId, UUID problemId);

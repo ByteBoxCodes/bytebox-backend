@@ -10,4 +10,5 @@ import com.byteboxcodes.byteboxbackend.entity.Topic;
 public interface TopicRespository extends JpaRepository<Topic, Long> {
     Optional<Topic> findByName(String name);
     List<Topic> findAllByIsActiveTrue();
+    long countByIsActiveTrue();
 }

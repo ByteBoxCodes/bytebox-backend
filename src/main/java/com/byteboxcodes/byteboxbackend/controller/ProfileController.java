@@ -1,6 +1,7 @@
 package com.byteboxcodes.byteboxbackend.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import com.byteboxcodes.byteboxbackend.dto.ApiResponse;
 import com.byteboxcodes.byteboxbackend.dto.HeaderProfileResponse;
 import com.byteboxcodes.byteboxbackend.dto.ProfileStatsResponse;
 import com.byteboxcodes.byteboxbackend.dto.ProfileUpdateRequest;
+import com.byteboxcodes.byteboxbackend.dto.PublicUserProfileResponse;
 import com.byteboxcodes.byteboxbackend.service.FileStorageService;
 import com.byteboxcodes.byteboxbackend.service.ProfileService;
 import com.byteboxcodes.byteboxbackend.service.UserService;
@@ -81,11 +83,20 @@ public class ProfileController {
         }
 
         String avatarUrl = fileStorageService.uploadFile(file);
-        
+
         ProfileUpdateRequest request = new ProfileUpdateRequest();
         request.setAvatarUrl(avatarUrl);
         userService.updateProfile(request);
 
         return avatarUrl;
+    }
+    @GetMapping("/{username}")
+    public ApiResponse<PublicUserProfileResponse> getPublicProfile(@PathVariable String username) {
+        PublicUserProfileResponse profile = profileService.getPublicProfile(username);
+        return ApiResponse.<PublicUserProfileResponse>builder()
+                .success(true)
+                .message("Profile fetched successfully")
+                .data(profile)
+                .build();
     }
 }
