@@ -106,6 +106,7 @@ public class ProfileServiceImpl implements ProfileService {
                                 .level(user.getLevel())
                                 .points(user.getPoints())
                                 .levelXp(user.getLevelXp())
+                                .isPremium(user.isPremium())
                                 .preferredLanguage(user.getPreferredLanguage())
                                 .githubUsername(user.getGithubUsername())
                                 .linkedinUsername(user.getLinkedinUsername())
@@ -128,6 +129,10 @@ public class ProfileServiceImpl implements ProfileService {
                                 .maxStreak(maxStreak)
                                 .languages(languages)
                                 .heatmap(heatmap)
+                                // --- equipped rewards ---
+                                .activeTitle(user.getActiveTitle())
+                                .activeAvatar(user.getActiveAvatar())
+                                .activeCard(user.getActiveCard())
                                 // --- recent submissions ---
                                 .recentSubmissions(recentSubmissions)
                                 .build();
@@ -245,6 +250,10 @@ public class ProfileServiceImpl implements ProfileService {
                                 .levelXp(user.getLevelXp())
                                 .currentStreak(user.getEffectiveCurrentStreak())
                                 .maxStreak(user.getMaxStreak())
+                                .isPremium(user.isPremium())
+                                .activeTitle(user.getActiveTitle())
+                                .activeAvatar(user.getActiveAvatar())
+                                .activeCard(user.getActiveCard())
                                 .build();
         }
 

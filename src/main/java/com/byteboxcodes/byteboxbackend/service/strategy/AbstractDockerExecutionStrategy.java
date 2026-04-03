@@ -34,6 +34,7 @@ public abstract class AbstractDockerExecutionStrategy implements CodeExecutionSt
                     "docker", "run",
                     "-i",                                 // interactive stdin pipe
                     "--rm",                               // auto-delete container on exit
+                    "--log-driver", "none",               // disable logs to save disk space
                     "--read-only",                        // root filesystem is fully read-only
                     "--tmpfs", "/tmp:rw,nosuid,exec,size=64m", // exec needed: gcc/g++ binaries run from /tmp
                     "--network", "none",                  // zero internet access

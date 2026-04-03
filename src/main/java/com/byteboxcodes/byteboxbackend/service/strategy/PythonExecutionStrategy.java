@@ -13,8 +13,9 @@ public class PythonExecutionStrategy extends AbstractDockerExecutionStrategy {
 
     @Override
     protected String getExecutionCommand(String base64Code) {
-        // Writes to /tmp (RAM-backed tmpfs), never touches the read-only container layer
-        return "echo '" + base64Code + "' | base64 -d > /tmp/main.py && python3 /tmp/main.py";
+        return "echo '" + base64Code + "' | base64 -d > /tmp/main.py"
+                + " && PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 python3 -B /tmp/main.py"
+                + " ; rm -f /tmp/main.py 2>/dev/null";
     }
 
     @Override

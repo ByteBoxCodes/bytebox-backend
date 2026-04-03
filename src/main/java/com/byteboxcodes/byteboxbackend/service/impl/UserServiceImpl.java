@@ -129,6 +129,10 @@ public class UserServiceImpl implements UserService {
                 .websiteUrl(user.getWebsiteUrl())
                 .instagramUsername(user.getInstagramUsername())
                 .createdAt(user.getCreatedAt().toString())
+                .isPremium(user.isPremium())
+                .activeTitle(user.getActiveTitle())
+                .activeAvatar(user.getActiveAvatar())
+                .activeCard(user.getActiveCard())
                 .build();
     }
 

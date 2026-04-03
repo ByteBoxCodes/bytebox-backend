@@ -15,4 +15,9 @@ public class HeaderProfileResponse {
     private Integer levelXp;
     private Integer currentStreak;
     private Integer maxStreak;
+    private boolean isPremium;
+
+    private String activeTitle;
+    private String activeAvatar;
+    private String activeCard;
 }

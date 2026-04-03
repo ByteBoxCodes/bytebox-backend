@@ -13,8 +13,9 @@ public class CppExecutionStrategy extends AbstractDockerExecutionStrategy {
 
     @Override
     protected String getExecutionCommand(String base64Code) {
-        // Decode to /tmp (RAM), compile output also to /tmp, execute from /tmp
-        return "echo '" + base64Code + "' | base64 -d > /tmp/main.cpp && g++ /tmp/main.cpp -o /tmp/main && /tmp/main";
+        return "echo '" + base64Code + "' | base64 -d > /tmp/main.cpp"
+                + " && g++ -O2 /tmp/main.cpp -o /tmp/main && /tmp/main"
+                + " ; rm -f /tmp/main.cpp /tmp/main 2>/dev/null";
     }
 
     @Override

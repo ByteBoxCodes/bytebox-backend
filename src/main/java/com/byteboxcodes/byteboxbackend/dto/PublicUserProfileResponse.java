@@ -23,6 +23,7 @@ public class PublicUserProfileResponse {
     private Integer level;
     private Integer points;
     private Integer levelXp;
+    private boolean isPremium;
     private ProgrammingLanguage preferredLanguage;
     private String githubUsername;
     private String linkedinUsername;
@@ -47,6 +48,11 @@ public class PublicUserProfileResponse {
     private List<String> languages;
     private List<HeatMapDTO> heatmap;
 
-    // ── Recent Submissions (last 15, no code) ────────────────────────────────
+    // ── Equipped Rewards ───────────────────────────────────────────────────────
+    private String activeTitle;
+    private String activeAvatar;
+    private String activeCard;
+
+    // ── Recent Submissions (last 5, no code) ─────────────────────────────────
     private List<SubmissionSummaryDTO> recentSubmissions;
 }

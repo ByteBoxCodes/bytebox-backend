@@ -174,15 +174,20 @@ public class SubmissionServiceImpl implements SubmissionService {
                                 int pointsToAward = 0;
                                 switch (problem.getDifficulty()) {
                                         case EASY:
-                                                pointsToAward = 10;
+                                                pointsToAward = 25;
                                                 break;
                                         case MEDIUM:
-                                                pointsToAward = 20;
+                                                pointsToAward = 50;
                                                 break;
                                         case HARD:
-                                                pointsToAward = 30;
+                                                pointsToAward = 75;
                                                 break;
                                 }
+
+                                if (user.isPremium()) {
+                                        pointsToAward += 10;
+                                }
+
                                 user.setPoints((user.getPoints() == null ? 0 : user.getPoints()) + pointsToAward);
                                 user.setLevelXp((user.getLevelXp() == null ? 0 : user.getLevelXp()) + pointsToAward);
 
@@ -201,9 +206,10 @@ public class SubmissionServiceImpl implements SubmissionService {
                                         }
                                 }
 
-                                // Update Level: Need 5 more xp per level. Level 1 -> 2 needs 15xp, 2 -> 3 needs 20xp
+                                // Update Level: Need 3 more xp per level. Level 1 -> 2 needs 13xp, 2 -> 3 needs
+                                // 16xp
                                 while (true) {
-                                        int requiredXp = 10 + (user.getLevel() * 5);
+                                        int requiredXp = 10 + (user.getLevel() * 3);
                                         if (user.getLevelXp() >= requiredXp) {
                                                 user.setLevelXp(user.getLevelXp() - requiredXp);
                                                 user.setLevel(user.getLevel() + 1);

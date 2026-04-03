@@ -104,6 +104,19 @@ public class User {
     @Column(name = "preferred_language")
     private ProgrammingLanguage preferredLanguage = ProgrammingLanguage.CPP;
 
+    @Builder.Default
+    @Column(name = "is_premium", nullable = false, columnDefinition = "boolean default false")
+    private boolean isPremium = false;
+
+    @Column(name = "active_title")
+    private String activeTitle;
+
+    @Column(name = "active_avatar")
+    private String activeAvatar;
+
+    @Column(name = "active_card")
+    private String activeCard;
+
     private LocalDateTime createdAt;
 
     public Integer getCurrentStreak() {

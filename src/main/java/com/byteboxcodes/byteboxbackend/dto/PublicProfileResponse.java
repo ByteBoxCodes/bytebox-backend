@@ -22,6 +22,11 @@ public class PublicProfileResponse {
     private Integer level;
     private Integer levelXp;
     private Long totalProblemsolved;
+    private boolean isPremium;
+
+    private String activeTitle;
+    private String activeAvatar;
+    private String activeCard;
 
     private String githubUsername;
     private String linkedinUsername;

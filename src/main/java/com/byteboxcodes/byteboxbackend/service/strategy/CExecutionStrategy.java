@@ -13,8 +13,9 @@ public class CExecutionStrategy extends AbstractDockerExecutionStrategy {
 
     @Override
     protected String getExecutionCommand(String base64Code) {
-        // Decode to /tmp (RAM), compile output also to /tmp, execute from /tmp
-        return "echo '" + base64Code + "' | base64 -d > /tmp/main.c && gcc /tmp/main.c -o /tmp/main && /tmp/main";
+        return "echo '" + base64Code + "' | base64 -d > /tmp/main.c"
+                + " && gcc -O2 /tmp/main.c -o /tmp/main && /tmp/main"
+                + " ; rm -f /tmp/main.c /tmp/main 2>/dev/null";
     }
 
     @Override

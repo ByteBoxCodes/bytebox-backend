@@ -1,0 +1,15 @@
+package com.byteboxcodes.byteboxbackend.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
+public class PremiumRequiredException extends RuntimeException {
+    public PremiumRequiredException(String message) {
+        super(message);
+    }
+
+    public PremiumRequiredException() {
+        super("Upgrade to Premium to access this feature.");
+    }
+}
