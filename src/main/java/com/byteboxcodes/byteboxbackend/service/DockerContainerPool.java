@@ -35,6 +35,8 @@ public class DockerContainerPool {
 
     @PostConstruct
     public void init() {
+        // Docker execution is disabled
+        /*
         this.strategies = strategyList.stream()
                 .collect(Collectors.toMap(
                         strategy -> strategy.getLanguageName().toUpperCase(),
@@ -98,10 +100,13 @@ public class DockerContainerPool {
             
             pool.put(language, containerQueue);
         }
+        */
     }
 
     @PreDestroy
     public void cleanup() {
+        // Docker execution is disabled
+        /*
         log.info("Shutting down Docker Container Pool...");
         for (BlockingQueue<String> queue : pool.values()) {
             while (!queue.isEmpty()) {
@@ -114,6 +119,7 @@ public class DockerContainerPool {
                 }
             }
         }
+        */
     }
 
     public String borrowContainer(String language) throws InterruptedException {
